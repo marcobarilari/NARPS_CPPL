@@ -5,7 +5,7 @@ function matlabbatch = subject_level_GLM_batch(matlabbatch, idx, analysis_dir, o
     matlabbatch{idx}.spm.stats.fmri_spec.timing.units = 'secs';
     matlabbatch{idx}.spm.stats.fmri_spec.timing.RT = opt.TR;
     matlabbatch{idx}.spm.stats.fmri_spec.timing.fmri_t = opt.nb_slices;
-    matlabbatch{idx}.spm.stats.fmri_spec.timing.fmri_t0 = cfg.slice_reference;
+    matlabbatch{idx}.spm.stats.fmri_spec.timing.fmri_t0 = opt.slice_reference;
     
     matlabbatch{idx}.spm.stats.fmri_spec.fact = struct('name',{},'levels',{});
     

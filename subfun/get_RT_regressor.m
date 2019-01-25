@@ -1,4 +1,4 @@
-function RT_regressors = get_RT_regressor(analysis_dir, data, cdt, opt, cfg)
+function RT_regressors = get_RT_regressor(analysis_dir, data, onsets, opt, cfg)
 % sets up an fMRI design with no data and then extracts parametric
 % modulators of RT for all events pooled together
 
