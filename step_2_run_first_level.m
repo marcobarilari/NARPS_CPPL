@@ -48,12 +48,14 @@ opt.prefix = 's';
 opt.suffix = '_bold_space-MNI152NLin2009cAsym_preproc';
 
 % windows matlab
-data_dir = 'D:\Dropbox\BIDS\NARPS';
-code_dir = 'D:\github\NARPS_CPPL\';
+% data_dir = 'D:\Dropbox\BIDS\NARPS';
+% code_dir = 'D:\github\NARPS_CPPL\';
+% output_dir = fullfile(data_dir, 'derivatives', 'spm12');
 
 % containers
-% data_dir = '/data';
-% code_dir = '/code/mcgurk';
+data_dir = '/data';
+code_dir = '/code';
+output_dir = '/output';
 % addpath(fullfile('/opt/spm12'));
 
 % add subfunctions to path
@@ -63,7 +65,6 @@ addpath(fullfile(code_dir,'subfun'));
 fMRIprep_DIR = fullfile(data_dir, 'derivatives', 'fmriprep');
 
 % define output dir
-output_dir = fullfile(data_dir, 'derivatives', 'spm12');
 [~, ~, ~] = mkdir(output_dir);
 
 % set defaults for memory usage fot make GLM run faster using subfun/spm_defaults.m
