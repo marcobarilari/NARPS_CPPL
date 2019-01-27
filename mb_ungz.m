@@ -7,6 +7,8 @@ function mb_ungz(folder_path)
 % 25/01/2019 - mb, add a sub function to unpack the files
 % 27/01/2019 - mb, check if a path is provided and if exists
 
+tic
+
 % Check if a path is provided and if exists
 if nargin == 0
     error('Please provide a folder path')
@@ -24,7 +26,7 @@ folder_subj = folder_main(dir_flags);
 % Extract only those that are subj folders.
 folder_subj(~strncmp( {folder_subj.name}, {'sub'}, 3)) = [];
 % Loop across folder and unpack .gz files
-for k = 1 : length(folder_subj)
+parfor k = 1 : length(folder_subj)
     fprintf('\nSub folder #%d = %s\n', k, folder_subj(k).name);
     % Anatomical data
     fprintf('\n Unpaking anat\n');
@@ -45,7 +47,7 @@ if size(dir(fullfile(folder_files,'*.gz')),1)
         % Make a list of the file in it with '.gz' extension
         file_list = ls(fullfile(folder_files, '*.gz'));
         % Unzip the '.gz' files
-        for ifile = 1:size(file_list,1)
+        parfor ifile = 1:size(file_list,1)
             fprintf('\n  Unpacking file #%d of %d\n', ifile, size(file_list,1));
             % Print the file name
             file_name = strsplit(file_list(ifile,:), filesep);
@@ -56,5 +58,7 @@ if size(dir(fullfile(folder_files,'*.gz')),1)
         fprintf('\nno ".gz" files to unpack\n')
     end
 end
+
+toc
 
 end
