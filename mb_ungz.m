@@ -1,13 +1,18 @@
 function mb_ungz(folder_path)
 
-% Function to unzip '.gz' files, octave environment
+% Function to unzip '.gz' files, tested on octave
 % written by mb, 23/01/2019
 %
 % histroy:
 % 25/01/2019 - mb, add a sub function to unpack the files
+% 27/01/2019 - mb, check if a path is provided and if exists
 
-%folder_path = '~/data/narps_workingfolder'
-
+% Check if a path is provided and if exists
+if nargin == 0
+    error('Please provide a folder path')
+elseif ~exist(folder_path, 'dir')
+    error('The path is not a folder, please insert a valid folder path')
+end
 % Get a list of all files and folders in this folder.
 folder_main = dir(folder_path);
 % Remove . and ..
@@ -35,8 +40,6 @@ for k = 1 : length(folder_subj)
     unpack_gz(folder_files)
 end
 
-
-
 function unpack_gz(folder_files)
 if size(dir(fullfile(folder_files,'*.gz')),1)
         % Make a list of the file in it with '.gz' extension
@@ -50,7 +53,7 @@ if size(dir(fullfile(folder_files,'*.gz')),1)
             gunzip(file_list(ifile,:));
         end
     else
-        fprintf('\nno files to unpack\n')
+        fprintf('\nno ".gz" files to unpack\n')
     end
 end
 
