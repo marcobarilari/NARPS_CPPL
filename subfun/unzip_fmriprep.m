@@ -26,7 +26,7 @@ if nargin < 2
     filter = '^*.nii.gz$';
 end
 
-folder_subj = get_subj_list(folder_path)
+folder_subj = get_subj_list(folder_path);
 
 % Loop across folder and unpack .gz files
 for k = 1 : length(folder_subj)

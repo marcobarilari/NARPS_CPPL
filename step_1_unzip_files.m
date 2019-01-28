@@ -16,3 +16,4 @@ filter =  'sub-.*space-MNI152.*.nii.gz$'; % to unzip only the files in MNI space
 
 % unzipping
 unzip_fmriprep(fMRIprep_DIR, filter)
+
