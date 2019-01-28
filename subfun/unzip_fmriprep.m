@@ -1,9 +1,13 @@
 function unzip_fmriprep(folder_path, filter)
 
 % Function to unzip '.gz' files, tested on octave
+% folder_path : path of the data set to browse through and unpack
+% filter : string pattern to select specific files to unzip - must be
+% regular expression compatible to work with spm_select
+% 
 % written by mb, 23/01/2019
 %
-% histroy:
+% history:
 % 25/01/2019 - mb, add a sub function to unpack the files
 % 27/01/2019 - mb, check if a path is provided and if exists
 
@@ -17,7 +21,7 @@ elseif ~exist(folder_path, 'dir')
 end
 
 % if no filter for spm_select is given we will select and unzip all .nii.gz
-% files
+% files 
 if nargin < 2
     filter = '^*.nii.gz$';
 end
@@ -41,7 +45,7 @@ for k = 1 : length(folder_subj)
     % Build subj folder path
     folder_files = fullfile(folder_path, folder_subj(k).name, 'anat');
     % Check if there are .gz file, then unpack them
-    unpack_gz(folder_files)
+    unpack_gz(folder_files, filter)
     % Functional data
     fprintf('\n Unpacking func\n');
     % Build subj folder path
