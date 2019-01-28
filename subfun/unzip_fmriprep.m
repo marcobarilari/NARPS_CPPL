@@ -4,7 +4,7 @@ function unzip_fmriprep(folder_path, filter)
 % folder_path : path of the data set to browse through and unpack
 % filter : string pattern to select specific files to unzip - must be
 % regular expression compatible to work with spm_select
-% 
+%
 % written by mb, 23/01/2019
 %
 % history:
@@ -21,21 +21,12 @@ elseif ~exist(folder_path, 'dir')
 end
 
 % if no filter for spm_select is given we will select and unzip all .nii.gz
-% files 
+% files
 if nargin < 2
     filter = '^*.nii.gz$';
 end
 
-% Get a list of all files and folders in this folder.
-folder_main = dir(folder_path);
-% Remove . and ..
-folder_main(ismember( {folder_main.name}, {'.', '..'})) = [];
-% Get a logical vector that tells which is a directory.
-dir_flags = [folder_main.isdir];
-% Extract only those that are directories.
-folder_subj = folder_main(dir_flags);
-% Extract only those that are subj folders.
-folder_subj(~strncmp( {folder_subj.name}, {'sub'}, 3)) = [];
+folder_subj = get_subj_list(folder_path)
 
 % Loop across folder and unpack .gz files
 for k = 1 : length(folder_subj)
