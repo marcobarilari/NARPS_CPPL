@@ -53,7 +53,7 @@ if size(dir(fullfile(folder_files,'*.gz')),1)
     % Make a list of the file in it with '.gz' extension
     file_list = ls(fullfile(folder_files, '*.gz'));
     % Unzip the '.gz' files
-    parfor ifile = 1:size(file_list,1)
+    for ifile = 1:size(file_list,1)
         fprintf('\n  Unpacking file #%d of %d\n', ifile, size(file_list,1));
         % Print the file name
         file_name = strsplit(file_list(ifile,:), filesep);
