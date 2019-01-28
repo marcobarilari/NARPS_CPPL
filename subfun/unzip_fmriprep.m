@@ -1,4 +1,4 @@
-function unzip(folder_path)
+function unzip_fmriprep(folder_path)
 
 % Function to unzip '.gz' files, tested on octave
 % written by mb, 23/01/2019
@@ -27,7 +27,7 @@ folder_subj = folder_main(dir_flags);
 folder_subj(~strncmp( {folder_subj.name}, {'sub'}, 3)) = [];
 
 % Loop across folder and unpack .gz files
-parfor k = 1 : length(folder_subj)
+for k = 1 : length(folder_subj)
     fprintf('\nSub folder #%d = %s\n', k, folder_subj(k).name);
     % Anatomical data
     fprintf('\n Unpacking anat\n');
@@ -51,7 +51,7 @@ end
 function unpack_gz(folder_files)
 if size(dir(fullfile(folder_files,'*.gz')),1)
     % Make a list of the file in it with '.gz' extension
-    file_list = ls(fullfile(folder_files, '*.gz'));
+    file_list = spm_select('FPList', folder_files, '^*.nii.gz$');
     % Unzip the '.gz' files
     for ifile = 1:size(file_list,1)
         fprintf('\n  Unpacking file #%d of %d\n', ifile, size(file_list,1));
