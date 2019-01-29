@@ -71,14 +71,14 @@ parfor i_subj = 1:nb_subjects
 
     % copy *events.tsv files from func
     copyfile(...
-        fullfile(code_dir, 'event_tsvs', [folder_subj{i_subj} '*.tsv']), ...
+        fullfile(code_dir, 'inputs', 'event_tsvs', [folder_subj{i_subj} '*.tsv']), ...
         fullfile(output_dir, folder_subj{i_subj}, 'func'))
 
     fprintf('\n')
 
 end
 
-fprintf('\n')
+fprintf('\n Files transferred\n')
 
 %% unzipping
 unzip_fmriprep(output_dir, filter)

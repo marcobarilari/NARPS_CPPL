@@ -3,7 +3,7 @@ Code for the CPPL participation to NARPS
 
 ## Running the analysis
 
-See further down for more info about docker and containers
+See further down for more info about docker and containers.
 
 You can specify to the container where your code and data are when you call it.
 - the folder that will be mapped onto `code` must contain this repository
@@ -12,26 +12,32 @@ You can specify to the container where your code and data are when you call it.
 
 Below are the commands examples we used to run this analysis
 
+### Start the docker image
+Run the following to start the octave-SPM docker image
+
+```
+docker run -it --rm \
+--entrypoint /bin/sh \
+-v /c/Users/Remi/Documents/NARPS/:/data:ro \
+-v /c/Users/Remi/Documents/NARPS/code/:/code/ \
+-v /c/Users/Remi/Documents/NARPS/:/output \
+spmcentral/spm:octave-latest
+```
+
+This will start octave and move you to the correct directory:
+```
+octave
+cd /code
+```
+
 ### Copy and unzipping data
+Type in the following command to copy the relevant files and unzip them:
+`step_1_copy_and_unzip_files.m`
 
-```
-docker run -it --rm \
--v /c/Users/Remi/Documents/NARPS/:/data:ro \
--v /c/Users/Remi/Documents/NARPS/code/:/code/ \
--v /c/Users/Remi/Documents/NARPS/derivatives/:/output \
-spmcentral/spm:octave-latest script '/code/step_1_copy_and_unzip_files.m'
-```
 
-### Smooting the data
-
-```
-docker run -it --rm \
--v /c/Users/Remi/Documents/NARPS/:/data:ro \
--v /c/Users/Remi/Documents/NARPS/code/:/code/ \
--v /c/Users/Remi/Documents/NARPS/derivatives/:/output \
-spmcentral/spm:octave-latest script '/code/step_2_smooth_func_files.m'
-```
-
+### Smoothing the data
+Type in the following command to copy the relevant files and unzip them:
+`step_2_smooth_func_files.m`
 
 
 ## docker
