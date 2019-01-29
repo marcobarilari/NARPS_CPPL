@@ -39,17 +39,15 @@ folder_subj = get_subj_list(folder_path);
 
 % Loop across folder and unpack .gz files
 parfor isubj = 1 : length(folder_subj)
-    
+
     matlabbatch = [];
-    
+
     fprintf('\nProcessing Subject n. %d of %d\n\n',isubj, size(folder_subj,1))
     % Build subj folder path
     folder_files = fullfile(folder_path, folder_subj(isubj).name, 'func');
     % Make a list of the file in it with '.gz' extension
     file_list = cellstr(spm_select('ExtFPList', folder_files, filter, Inf));
-    
-    file_list
-    
+
     if isempty(file_list)
         warning('no file to smooth for subject %s', folder_subj(isubj).name)
     elseif size(file_list,1)<4
@@ -60,12 +58,12 @@ parfor isubj = 1 : length(folder_subj)
         matlabbatch{1}.spm.spatial.smooth.fwhm   = [ FWHM FWHM FWHM ];
         matlabbatch{1}.spm.spatial.smooth.dtype  = 0;
         matlabbatch{1}.spm.spatial.smooth.prefix = prefix;
-        
+
         save_the_job(matlabbatch, folder_files, folder_subj(isubj).name);
-        
+
         spm_jobman('run',matlabbatch);
     end
-    
+
 end
 
 toc
