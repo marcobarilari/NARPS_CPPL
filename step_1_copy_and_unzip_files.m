@@ -14,7 +14,7 @@ clc
 
 machine_id = 0;% 0: container ;  1: Remi ;  2: Marco
 filter =  'sub-.*space-MNI152.*.nii.gz$'; % to unzip only the files in MNI space
-nb_subjects = 2; % to only try on a couple of subjects; comment out to run on all
+% nb_subjects = 2; % to only try on a couple of subjects; comment out to run on all
 
 %% setting up
 % setting up directories
