@@ -30,7 +30,7 @@ end
 if ~exist('filter', 'var')
     filter =  'sub-.*space-MNI152.*preproc.nii$';
     fprintf('\n- filter not provided, set to %s as default\n', filter)
-else fprintf('\n- "prefix" of the smoothed data is %s\n', filter);
+else fprintf('\n- "filter" of the smoothed data is %s\n', filter);
 end
 
 
@@ -47,6 +47,8 @@ parfor isubj = 1 : length(folder_subj)
     folder_files = fullfile(folder_path, folder_subj(isubj).name, 'func');
     % Make a list of the file in it with '.gz' extension
     file_list = cellstr(spm_select('ExtFPList', folder_files, filter, Inf));
+    
+    file_list
     
     if isempty(file_list)
         warning('no file to smooth for subject %s', folder_subj(isubj).name)
