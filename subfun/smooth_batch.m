@@ -48,15 +48,21 @@ parfor isubj = 1 : length(folder_subj)
     % Make a list of the file in it with '.gz' extension
     file_list = cellstr(spm_select('ExtFPList', folder_files, filter, Inf));
     
-    % Create the batch
-    matlabbatch{1}.spm.spatial.smooth.data   = cellstr(file_list);
-    matlabbatch{1}.spm.spatial.smooth.fwhm   = [ FWHM FWHM FWHM ];
-    matlabbatch{1}.spm.spatial.smooth.dtype  = 0;
-    matlabbatch{1}.spm.spatial.smooth.prefix = prefix;
-    
-    save_the_job(matlabbatch, folder_files, folder_subj(isubj).name);
-    
-    spm_jobman('run',matlabbatch);
+    if isempty(file_list)
+        warning('no file to smooth for subject %s', folder_subj(isubj).name)
+    elseif size(file_list,1)<4
+        warning('some files are missing from subject %s', folder_subj(isubj).name)
+    else
+        % Create the batch
+        matlabbatch{1}.spm.spatial.smooth.data   = cellstr(file_list);
+        matlabbatch{1}.spm.spatial.smooth.fwhm   = [ FWHM FWHM FWHM ];
+        matlabbatch{1}.spm.spatial.smooth.dtype  = 0;
+        matlabbatch{1}.spm.spatial.smooth.prefix = prefix;
+        
+        save_the_job(matlabbatch, folder_files, folder_subj(isubj).name);
+        
+        spm_jobman('run',matlabbatch);
+    end
     
 end
 
