@@ -29,7 +29,7 @@ end
 folder_subj = get_subj_list(folder_path);
 
 % Loop across folder and unpack .gz files
-for k = 1 : length(folder_subj)
+parfor k = 1 : length(folder_subj)
     fprintf('\nSub folder #%d = %s\n', k, folder_subj(k).name);
     % Anatomical data
     fprintf('\n Unpacking anat\n');
