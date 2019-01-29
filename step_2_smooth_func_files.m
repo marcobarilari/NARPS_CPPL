@@ -7,10 +7,10 @@
 % -v /c/Users/Remi/Documents/NARPS/derivatives/:/output \
 % spmcentral/spm:octave-latest script '/code/step_2_smooth_func_files.m'
 
-clear 
+clear
 clc
 
-machine_id = 1;% 0: container ;  1: Remi ;  2: Marco
+machine_id = 0;% 0: container ;  1: Remi ;  2: Marco
 FWHM = 6;
 prefix = 's';
 filter =  'sub-.*space-MNI152NLin2009cAsym_preproc.nii'; % to smooth only the preprocessed files
