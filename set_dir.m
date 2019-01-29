@@ -11,7 +11,7 @@ switch machine_id
         % containers
         data_dir = '/data';
         code_dir = '/code';
-        output_dir = '/output/spm12';
+        output_dir = '/output/derivatives/spm12';
         addpath(fullfile('/opt/spm12'));
     case 1 % windows matlab/octave : Remi
         code_dir = 'C:\Users\Remi\Documents\NARPS\code';

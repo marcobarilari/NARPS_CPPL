@@ -18,11 +18,13 @@ Run the following to start the octave-SPM docker image
 ```
 docker run -it --rm \
 --entrypoint /bin/sh \
--v /c/Users/Remi/Documents/NARPS/:/data:ro \
--v /c/Users/Remi/Documents/NARPS/code/:/code/ \
--v /c/Users/Remi/Documents/NARPS/:/output \
+-v /Data/NARPS:/data:ro \
+-v /Data/NARPS/NARPS_CPPL:/code/ \
+-v /Data/NARPS:/output \
 spmcentral/spm:octave-latest
+
 ```
+
 
 This will start octave and move you to the correct directory:
 ```
@@ -32,7 +34,7 @@ cd /code
 
 ### Copy and unzipping data
 Type in the following command to copy the relevant files and unzip them:
-`step_1_copy_and_unzip_files.m`
+`step_1_copy_and_unzip_files`
 
 
 ### Smoothing the data

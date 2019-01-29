@@ -21,7 +21,7 @@ nb_subjects = 2; % to only try on a couple of subjects; comment out to run on al
 [data_dir, code_dir, output_dir, fMRIprep_DIR] = set_dir(machine_id);
 
 % creating output sub-dirs in derivatives/spm12
-mkdir(output_dir)
+[~, ~, ~] = mkdir(output_dir);
 folder_subj = get_subj_list(fMRIprep_DIR);
 folder_subj = cellstr(char({folder_subj.name}')); % turn subject folders into a cellstr
 spm_mkdir(output_dir, folder_subj, {'anat','func'});
@@ -52,27 +52,27 @@ parfor i_subj = 1:nb_subjects
         for i_file = 1:size(file_list,1)
             spm_copy(file_list(i_file,:), ...
                 fullfile(output_dir, folder_subj{i_subj}, sub_folders{i_folder}), ...
-                'nifti', true)
+                'nifti', true);
         end
     end
 
     % copy *.txt and *.h5 files from anat (in case we want to do some normalization)
     copyfile(...
         fullfile(sub_source_folder, 'anat', '*.txt'), ...
-        fullfile(output_dir, folder_subj{i_subj}, 'anat'))
+        fullfile(output_dir, folder_subj{i_subj}, 'anat'));
         copyfile(...
         fullfile(sub_source_folder, 'anat', '*.h5'), ...
-        fullfile(output_dir, folder_subj{i_subj}, 'anat'))
+        fullfile(output_dir, folder_subj{i_subj}, 'anat'));
 
     % copy confound*.tsv files from func
     copyfile(...
         fullfile(sub_source_folder, 'func', '*.tsv'), ...
-        fullfile(output_dir, folder_subj{i_subj}, 'func'))
+        fullfile(output_dir, folder_subj{i_subj}, 'func'));
 
     % copy *events.tsv files from func
     copyfile(...
         fullfile(code_dir, 'inputs', 'event_tsvs', [folder_subj{i_subj} '*.tsv']), ...
-        fullfile(output_dir, folder_subj{i_subj}, 'func'))
+        fullfile(output_dir, folder_subj{i_subj}, 'func'));
 
     fprintf('\n')
 
