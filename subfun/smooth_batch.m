@@ -26,16 +26,8 @@ elseif ~exist(folder_path, 'dir')
 else fprintf('\n- I will look for data to smooth here %s\n', folder_path);
 end
 
-% Get a list of all files and folders in this folder.
-folder_main = dir(folder_path);
-% Remove . and ..
-folder_main(ismember( {folder_main.name}, {'.', '..'})) = [];
-% Get a logical vector that tells which is a directory.
-dir_flags = [folder_main.isdir];
-% Extract only those that are directories.
-folder_subj = folder_main(dir_flags);
-% Extract only those that are subj folders.
-folder_subj(~strncmp( {folder_subj.name}, {'sub'}, 3)) = [];
+% get subject list and folders
+folder_subj = get_subj_list(folder_path);
 
 % Filter only the func data to smooth
 filter =  'sub-.*space-MNI152.*preproc.nii$';
