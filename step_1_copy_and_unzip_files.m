@@ -5,7 +5,7 @@
 % -v /c/Users/Remi/Documents/NARPS/:/data \
 % -v /c/Users/Remi/Documents/NARPS/code/:/code/ \
 % -v /c/Users/Remi/Documents/NARPS/derivatives/:/output \
-% spmcentral/spm:octave-latest script '/code/step_1_unzip_files.m'
+% spmcentral/spm:octave-latest script '/code/step_1_copy_and_unzip_files.m'
 
 
 %% parameters
