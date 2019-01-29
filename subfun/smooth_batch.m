@@ -1,6 +1,6 @@
 function mb_smooth(FWHM, prefix, folder_path)
 
-spm fmri
+% spm fmri
 
 tic
 
@@ -41,7 +41,7 @@ folder_subj(~strncmp( {folder_subj.name}, {'sub'}, 3)) = [];
 filter =  'sub-.*space-MNI152.*preproc.nii$';
 
 % Loop across folder and unpack .gz files
-parfor isubj = 1 : length(folder_subj)
+for isubj = 1 : length(folder_subj)
     
     matlabbatch = [];
     
@@ -51,13 +51,15 @@ parfor isubj = 1 : length(folder_subj)
     % Make a list of the file in it with '.gz' extension
     file_list = cellstr(spm_select('ExtFPList', folder_files, filter, Inf));
     
+    
+    
     % Create the batch
     matlabbatch{1}.spm.spatial.smooth.data   = cellstr(file_list);
     matlabbatch{1}.spm.spatial.smooth.fwhm   = [ FWHM FWHM FWHM ];
     matlabbatch{1}.spm.spatial.smooth.dtype  = 0;
     matlabbatch{1}.spm.spatial.smooth.prefix = prefix;
     
-    save_the_job(matlabbatch, folder_subj);
+    save_the_job(matlabbatch, folder_files, folder_subj(isubj).name);
     
     spm_jobman('run',matlabbatch);
     
@@ -68,7 +70,7 @@ toc
 end
 
 
-function save_the_job
-job_name = fullfile(folder_files,['job_' folder_subj(isubj).name '_smoothing.mat' ]);
+function save_the_job(matlabbatch, folder_files, folder_subj_name)
+job_name = fullfile(folder_files,['job_' folder_subj_name '_smoothing.mat' ]);
 save(job_name, 'matlabbatch')
 end
