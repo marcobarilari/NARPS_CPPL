@@ -14,7 +14,7 @@ clc
 
 machine_id = 1;% 0: container ;  1: Remi ;  2: Marco
 filter =  'sub-.*space-MNI152.*.nii.gz$'; % to unzip only the files in MNI space
-
+nb_subjects = 2; % to only try on a couple of subjects; comment out to run on all
 
 %% setting up
 % setting up directories
@@ -26,11 +26,14 @@ folder_subj = get_subj_list(fMRIprep_DIR);
 folder_subj = cellstr(char({folder_subj.name}')); % turn subject folders into a cellstr
 spm_mkdir(output_dir, folder_subj, {'anat','func'});
 
+if ~exist('nb_subjects', 'var')
+    nb_subjects = numel(folder_subj);
+end
 
 %% copy files of interest to another folder ('derivatives/spm12')
 sub_folders = {'anat', 'func'};
 
-parfor i_subj = 1:numel(folder_subj)
+parfor i_subj = 1:nb_subjects
     
     fprintf('\n%s', folder_subj{i_subj});
     
@@ -75,6 +78,7 @@ parfor i_subj = 1:numel(folder_subj)
     
 end
 
+fprintf('\n')
 
 %% unzipping
 unzip_fmriprep(output_dir, filter)
