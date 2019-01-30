@@ -24,11 +24,13 @@ for i_group = 0:1 %loop through each group
             fullfile(code_dir, 'inputs', 'event_tsvs'), ...
             ['^' subject '.*.tsv$']);
         
-        % load each event file
         no_resp = [];
         RT_mat = [];
+        aceept_mat = [];
         
         for i_file = 1:size(files_2_load)
+            
+            % load each event file
             data = spm_load(files_2_load(i_file, :));
             
             % define gain and loss range for that subject
@@ -69,10 +71,13 @@ for i_group = 0:1 %loop through each group
         
     end
 
+    range(i_group+1).gain = gain_range;
+    range(i_group+1).loss = loss_range;
+    
 end
 
 
-%% plot
+%% plot RT
 figure('name', 'RT')
 
 CLIM = [1 2];
@@ -80,11 +85,31 @@ CLIM = [1 2];
 subplot(1, 2, 1)
 imagesc( nanmean(RT_mat_grp{1},3) , CLIM )
 axis square
+title('RT equal indifference (seconds)')
+ylabel('loss')
+xlabel('gain')
+set(gca, 'xtick', 1:2:numel(range(1).gain), ...
+    'xticklabel', range(1).gain(1:2:numel(range(1).gain)), ...
+    'ytick', 1:2:numel(range(1).loss), ...
+    'yticklabel', range(1).loss(1:2:numel(range(1).loss)))
+colorbar
 
 subplot(1, 2, 2)
 imagesc( nanmean(RT_mat_grp{2},3) , CLIM )
 axis square
+title('RT equal range (seconds)')
+ylabel('loss')
+xlabel('gain')
+set(gca, 'xtick', 1:2:numel(range(2).gain), ...
+    'xticklabel', range(2).gain(1:2:numel(range(2).gain)), ...
+    'ytick', 1:2:numel(range(2).loss), ...
+    'yticklabel', range(2).loss(1:2:numel(range(2).loss)))
+colorbar
 
 
+%% plot missed responses
 figure('name', 'Missed responses')
 bar(participants.noresp)
+title('Missed responses')
+ylabel('number of misses')
+xlabel('subject')
