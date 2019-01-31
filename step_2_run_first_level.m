@@ -41,21 +41,21 @@ opt.task = 'MGT';
 opt.nb_slices = 64;
 opt.TR = 1;
 opt.TA = 0.9844;
-opt.slice_reference =32;
+opt.slice_reference = 32;
 
 % manually specify prefix of the images to use
 opt.prefix = 's';
 opt.suffix = '_bold_space-MNI152NLin2009cAsym_preproc';
 
 % windows matlab
-% data_dir = 'D:\Dropbox\BIDS\NARPS';
-% code_dir = 'D:\github\NARPS_CPPL\';
-% output_dir = fullfile(data_dir, 'derivatives', 'spm12');
+data_dir = 'D:\Dropbox\BIDS\NARPS';
+code_dir = 'C:\Users\Remi\Documents\NARPS\code';
+output_dir = fullfile(data_dir, 'derivatives', 'spm12');
 
 % containers
-data_dir = '/data';
-code_dir = '/code';
-output_dir = '/output';
+% data_dir = '/data';
+% code_dir = '/code';
+% output_dir = '/output';
 % addpath(fullfile('/opt/spm12'));
 
 % add subfunctions to path
@@ -80,7 +80,7 @@ nb_subj = numel(subj_ls);
 
 % get additional data from metadata (TR, resolution, slice timing
 % parameters)
-[opt] = get_metadata(bids_struct, opt);
+% [opt] = get_metadata(bids_struct, opt);
 
 % set up all the possible of combinations of GLM possible given the
 % different analytical options we have
@@ -217,7 +217,7 @@ for isubj = 1%:nb_subj
         matlabbatch = [];
         matlabbatch{1}.spm.stats.fmri_est.spmmat{1,1} = fullfile(analysis_dir, 'SPM.mat');
         matlabbatch{1}.spm.stats.fmri_est.method.Classical = 1;
-        spm_jobman('run', matlabbatch)
+%         spm_jobman('run', matlabbatch)
         
         % estimate contrasts
         %         matlabbatch = [];
