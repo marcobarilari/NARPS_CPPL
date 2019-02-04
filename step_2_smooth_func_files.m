@@ -12,7 +12,7 @@ clc
 
 machine_id = 0;% 0: container ;  1: Remi ;  2: Marco
 FWHM = 6;
-prefix = 's';
+prefix = 's-6_';
 filter =  'sub-.*space-MNI152NLin2009cAsym_preproc.nii'; % to smooth only the preprocessed files
 
 % setting up directories

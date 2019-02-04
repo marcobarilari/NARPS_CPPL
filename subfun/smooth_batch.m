@@ -38,7 +38,9 @@ end
 folder_subj = get_subj_list(folder_path);
 
 % Loop across folder and unpack .gz files
-parfor isubj = 1 : length(folder_subj)
+parfor isubj = 84 : length(folder_subj)
+
+    tic
 
     matlabbatch = [];
 
@@ -63,6 +65,8 @@ parfor isubj = 1 : length(folder_subj)
 
         spm_jobman('run',matlabbatch);
     end
+
+    toc
 
 end
 
