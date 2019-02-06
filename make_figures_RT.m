@@ -113,3 +113,42 @@ bar(participants.noresp)
 title('Missed responses')
 ylabel('number of misses')
 xlabel('subject')
+
+
+%% plot RT times for each subject
+figure('name', 'RT for each subject ')
+
+subplot(1, 2, 1)
+
+RT_to_plot = reshape(RT_mat_grp{1}, ...
+    [size(RT_mat_grp{1},1) * size(RT_mat_grp{1},2) , size(RT_mat_grp{1},3)]);
+
+RT_to_plot(RT_to_plot<.5) = NaN;
+
+boxplot(RT_to_plot)
+
+title('RT distribution per subject  - equal indifference group')
+ylabel('RT (secs)')
+xlabel('subject')
+set(gca, 'xtick', 1:2:size(RT_mat_grp{1},3), ...
+    'xticklabel', 1:2:size(RT_mat_grp{1},3), ...
+    'ytick', 0:.5:4, ...
+    'yticklabel', 0:.5:4)
+
+
+subplot(1, 2, 2)
+
+RT_to_plot = reshape(RT_mat_grp{2}, ...
+    [size(RT_mat_grp{2},1) * size(RT_mat_grp{2},2) , size(RT_mat_grp{2},3)]);
+
+RT_to_plot(RT_to_plot<.5) = NaN;
+
+boxplot(RT_to_plot)
+
+title('RT distribution per subject  - equal range group')
+ylabel('RT (secs)')
+xlabel('subject')
+set(gca, 'xtick', 1:2:size(RT_mat_grp{1},3), ...
+    'xticklabel', 1:2:size(RT_mat_grp{1},3), ...
+    'ytick', 0:.5:4, ...
+    'yticklabel', 0:.5:4)
