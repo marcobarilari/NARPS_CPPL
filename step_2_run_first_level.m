@@ -32,11 +32,16 @@
 %  - one to estimate contrasts
 % 
 
+%% parameters
 clear
 clc
 
+machine_id = 0;% 0: container ;  1: Remi ;  2: Marco
+filter =  'sub-.*space-MNI152.*.nii.gz$'; % to unzip only the files in MNI space
+% nb_subjects = 2; % to only try on a couple of subjects; comment out to run on all
 
-%% Set options, matlab path
+
+%% Set options
 opt.task = 'MGT';
 opt.nb_slices = 64;
 opt.TR = 1;
@@ -47,41 +52,24 @@ opt.slice_reference = 32;
 opt.prefix = 's';
 opt.suffix = '_bold_space-MNI152NLin2009cAsym_preproc';
 
-% windows matlab
-data_dir = 'D:\Dropbox\BIDS\NARPS';
-code_dir = 'C:\Users\Remi\Documents\NARPS\code';
-output_dir = fullfile(data_dir, 'derivatives', 'spm12');
-
-% containers
-% data_dir = '/data';
-% code_dir = '/code';
-% output_dir = '/output';
-% addpath(fullfile('/opt/spm12'));
-
-% add subfunctions to path
-addpath(fullfile(code_dir,'subfun'));
-
-% define derivatives fMRIprep dir 
-fMRIprep_DIR = fullfile(data_dir, 'derivatives', 'fmriprep');
-
-% define output dir
-[~, ~, ~] = mkdir(output_dir);
-
 % set defaults for memory usage fot make GLM run faster using subfun/spm_defaults.m
 defaults = spm_get_defaults;
 
 
+%% setting up
+% setting up directories
+[data_dir, code_dir, output_dir, fMRIprep_DIR] = set_dir(machine_id);
+
+% listing subjects
+folder_subj = get_subj_list(output_dir);
+folder_subj = cellstr(char({folder_subj.name}')); % turn subject folders into a cellstr
+
+if ~exist('nb_subjects', 'var')
+    nb_subjects = numel(folder_subj);
+end
+
+
 %% get data set and analysis info
-% data set (won't work until we have a minimal BIDS data set downloaded)
-bids_dir = fullfile(data_dir, 'rawdata');
-bids_struct = spm_BIDS(bids_dir);
-subj_ls = spm_BIDS(bids_struct, 'subjects');
-nb_subj = numel(subj_ls);
-
-% get additional data from metadata (TR, resolution, slice timing
-% parameters)
-% [opt] = get_metadata(bids_struct, opt);
-
 % set up all the possible of combinations of GLM possible given the
 % different analytical options we have
 [opt, all_GLMs] = set_all_GLMS(opt);
