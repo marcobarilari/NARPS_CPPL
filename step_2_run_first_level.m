@@ -3,23 +3,17 @@
 % for the GLM: this is currentlyy defined in the set_all_GLMS.m subfunction
 % but should eventually be partly moved out of it.
 
-% possible options of subject level GLM
-%  - different high pass filter (HPF): 128
-%  - design: events or blocks
-%  - correction for reaction time (RT): yes, no
-%  - time derivative: yes, no
-%  - dispersion derivatives: yes, no
-%  - include mvt noise regressors: yes, no
+% Garden of forking paths: GoFP
+% for the possible options of subject level GLM see the functions:
+%  - set_all_GLMS.m: that lists all the possible options of GLM to run
+%  - get_cfg_GLMS_to_run.m: sets the GLM that will actually be run
 
 % TO DO:
 % - scrubbing
 % - make more verbose
 % - send email in case of crash or when finished
 % - do time estimation
-% - how to deal with unresponded trials?
-% - criterion to remove subjects (move to 2nd level script)
-% - fit GLM for all runs and only exclude when creating contrasts or
-%  already exclude runs ? At the moment it fits all runs
+% - how to deal with unresponded trials
 % - run t-contrasts for all the needed condition for the group level
 % - subfunction to create an RT regressor and add it to the design if
 % needed
@@ -50,8 +44,8 @@ opt.TA = 0.9844;
 opt.slice_reference = 32;
 
 % manually specify prefix of the images to use
-opt.prefix = 's';
-opt.suffix = '_bold_space-MNI152NLin2009cAsym_preproc';
+opt.prefix = smoothing_prefix;
+opt.suffix = filter;
 
 % set defaults for memory usage fot make GLM run faster using subfun/spm_defaults.m
 defaults = spm_get_defaults;
@@ -146,7 +140,7 @@ for isubj = 1%:nb_subj
     for iGLM = 1:size(all_GLMs)
         
         tic
-        
+
         % get configuration for this GLM
         cfg = get_configuration(all_GLMs, opt, iGLM);
         
@@ -158,6 +152,12 @@ for isubj = 1%:nb_subj
         
         delete(fullfile(analysis_dir,'SPM.mat'))
         
+        
+        if cfg.explicit_mask
+            cfg.explicit_mask = explicit_mask;
+        else
+            cfg.explicit_mask = '';
+        end
         
         
         % TO DO
