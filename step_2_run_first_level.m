@@ -72,7 +72,8 @@ end
 %% get data set and analysis info
 % set up all the possible of combinations of GLM possible given the
 % different analytical options we have
-[opt, all_GLMs] = set_all_GLMS(opt);
+[sets] = get_cfg_GLMS_to_run();
+[opt, all_GLMs] = set_all_GLMS(opt, sets);
 
 
 %% for each subject
