@@ -4,7 +4,7 @@ function [opt, all_GLMs] = set_all_GLMS(opt, sets)
 
 opt.explicit_mask = [0 1]; % use fMRIprep mask
 
-opt.inclusive_mask_threshold = [0 0.8]; % SPM threshold to define inclusive mask
+opt.inc_mask_thres = [0 0.8]; % SPM threshold to define inclusive mask
 
 opt.HPF = 128; % high pass filter
 
@@ -34,7 +34,7 @@ if ~exist('sets', 'var')
     
     sets{1} = 1:numel(opt.explicit_mask);
     
-    sets{end+1} = 1:numel(opt.inclusive_mask_threshold);
+    sets{end+1} = 1:numel(opt.inc_mask_thres);
     
     sets{end+1} = 1:numel(opt.HPF);
     

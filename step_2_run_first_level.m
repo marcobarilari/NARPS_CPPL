@@ -144,6 +144,7 @@ for isubj = 1%:nb_subj
         % get configuration for this GLM
         cfg = get_configuration(all_GLMs, opt, iGLM);
         
+        % create the directory for this specific analysis
         analysis_dir = name_analysis_dir(cfg);
         analysis_dir = fullfile ( ...
             output_dir, ...
@@ -153,6 +154,7 @@ for isubj = 1%:nb_subj
         delete(fullfile(analysis_dir,'SPM.mat'))
         
         
+        % define the explicit mask for this GLM if specified
         if cfg.explicit_mask
             cfg.explicit_mask = explicit_mask;
         else

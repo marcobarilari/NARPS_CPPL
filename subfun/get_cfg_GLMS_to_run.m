@@ -5,7 +5,7 @@ function [sets] = get_cfg_GLMS_to_run()
 % opt.explicit_mask = [0 1]; 
 sets{1} = 2;
 
-% opt.inclusive_mask_threshold = [0 0.8]; 
+% opt.inc_mask_thres = [0 0.8]; 
 sets{end+1} = 1;
 
 % opt.HPF = 128; % high pass filter

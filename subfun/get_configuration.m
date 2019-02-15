@@ -4,7 +4,7 @@ function cfg = get_configuration(all_GLMs, opt, iGLM)
 
 cfg.explicit_mask = opt.explicit_mask(all_GLMs(iGLM,1));
 
-cfg.inclusive_mask_threshold  = opt.inclusive_mask_threshold(all_GLMs(iGLM,2));
+cfg.inc_mask_thres  = opt.inc_mask_thres(all_GLMs(iGLM,2));
 
 cfg.HPF = opt.HPF(all_GLMs(iGLM,3));
 
