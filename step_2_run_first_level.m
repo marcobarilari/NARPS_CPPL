@@ -30,14 +30,15 @@
 %  - one to specify models
 %  - one to estimate them
 %  - one to estimate contrasts
-% 
+
 
 %% parameters
 clear
 clc
 
-machine_id = 0;% 0: container ;  1: Remi ;  2: Marco
-filter =  'sub-.*space-MNI152.*.nii.gz$'; % to unzip only the files in MNI space
+machine_id = 1;% 0: container ;  1: Remi ;  2: Marco
+smoothing_prefix = 's-6_';
+filter =  '.*_bold_space-MNI152NLin2009cAsym_preproc.nii$'; % to unzip only the files in MNI space
 % nb_subjects = 2; % to only try on a couple of subjects; comment out to run on all
 
 
@@ -79,54 +80,51 @@ end
 %% for each subject
 for isubj = 1%:nb_subj
     
-    fprintf('running sub-%s\n', subj_ls{isubj})
+    fprintf('running %s\n', folder_subj{isubj})
     
-    subj_dir = fullfile(fMRIprep_DIR, ['sub-' subj_ls{isubj}], 'func');
+    subj_dir = fullfile(output_dir, [folder_subj{isubj}], 'func');
 
     
-    %% get runs info
-    run_ls = spm_BIDS(bids_struct, 'runs', 'sub', subj_ls{isubj}, ...
-        'type', 'bold');
-    nb_runs = numel(run_ls);
-        
+    %% get explicit mask
+
+    explicit_mask = spm_select('FPList', ...
+        subj_dir ,...
+        ['^' folder_subj{isubj} ...
+        '_task-MGT_run-.*_bold_space-MNI152NLin2009cAsym_brainmask.nii$'] );
+
+    
+    %% get runs data
+    
+    data = spm_select('FPList', ...
+        subj_dir, ...
+        ['^' folder_subj{isubj} opt.suffix ] );
+    data = cellstr(data);
+
+    nb_runs = size(data,1);
+
     
     %%  get data, onsets and extra regressors for each run  
+    
     fprintf(' getting onsets and data\n')
     for iRun = 1:nb_runs
-        
-        run_data = spm_BIDS(bids_struct, 'data', 'sub', subj_ls{isubj}, ...
-        'type', 'bold', 'run', run_ls{iRun});
-    
-        %in case there is nii.gz and a .nii file for the same run we only
-        %take the .nii.gz
-        if numel(run_data)>1 
-            run_data = {run_data{2}};
-        end
-        
+
         % get onsets for all the conditions and blocks as well as each trial caracteristics
-        events_file = strrep(run_data{1}, 'bold.nii.gz', 'events.tsv');
+        events_file = strrep( data{iRun,1}, ...
+            '_bold_space-MNI152NLin2009cAsym_preproc.nii', ...
+            '_events.tsv');
         onsets{iRun} = spm_load(events_file); %#ok<*SAGROW>
         onsets{iRun}.name = 'gamble_trial';
         onsets{iRun}.param = {'gain' 'loss'}; %name of the fields to use as parametric factors
 
-        
-        
-        
         % identify missed responses
-            % this will need some reworking to 
         onsets = get_cdt_onsets(onsets, iRun);
 
-        
-        
-        
         % list realignement parameters and other fMRIprep data for each run
-        confounds_file = spm_select('FPList', subj_dir, ...
-            ['^.*run-' run_ls{iRun} '_bold_confounds\.tsv$']);
+        confounds_file = strrep( data{iRun,1}, ...
+            '_space-MNI152NLin2009cAsym_preproc.nii', ...
+            '_confounds.tsv');
         confounds{iRun} = spm_load(confounds_file); %#ok<*SAGROW>
 
-        data{iRun,1} = spm_select('FPList', subj_dir, ...
-            ['^.*run-' run_ls{iRun} '.*' opt.suffix '\.nii$']);
-        
     end
     
     
@@ -155,7 +153,7 @@ for isubj = 1%:nb_subj
         analysis_dir = name_analysis_dir(cfg);
         analysis_dir = fullfile ( ...
             output_dir, ...
-            ['sub-' subj_ls{isubj}], analysis_dir );
+            folder_subj{isubj}, analysis_dir );
         [~, ~, ~] = mkdir(analysis_dir);
         
         delete(fullfile(analysis_dir,'SPM.mat'))
