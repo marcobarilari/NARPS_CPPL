@@ -9,13 +9,14 @@ function matlabbatch = subject_level_GLM_batch(matlabbatch, idx, analysis_dir, o
     
     matlabbatch{idx}.spm.stats.fmri_spec.fact = struct('name',{},'levels',{});
     
-    matlabbatch{idx}.spm.stats.fmri_spec.bases.hrf.derivs = [cfg.time_der, 0]; % First is time derivative, Second is dispersion
+    matlabbatch{idx}.spm.stats.fmri_spec.bases.hrf.derivs = ...
+        [cfg.time_der, cfg.disp_der]; % First is time derivative, Second is dispersion
     
     matlabbatch{idx}.spm.stats.fmri_spec.volt = 1;
     
     matlabbatch{idx}.spm.stats.fmri_spec.global = 'None';
     
-    matlabbatch{idx}.spm.stats.fmri_spec.mask = {''};
+    matlabbatch{idx}.spm.stats.fmri_spec.mask = {cfg.explicit_mask};
     
-    matlabbatch{idx}.spm.stats.fmri_spec.cvi = 'AR(1)';
+    matlabbatch{idx}.spm.stats.fmri_spec.cvi = cfg.spher_cor{1};
 end

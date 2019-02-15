@@ -27,7 +27,7 @@ opt.confounds = {...
 opt.FD_censor.do = [0 1]; % censor points with a framewise displacement superior to threshold
 opt.FD_censor.thres = 0.5; % FD threshold to censor points (in mm)
 
-opt.spher_cor = {'AR1' 'fast' 'none'}; % non-sphericity correction used for the estimation
+opt.spher_cor = {'AR(1)' 'FAST' 'none'}; % non-sphericity correction used for the estimation
 
 if ~exist('sets', 'var')
     % list all possible GLMs to run

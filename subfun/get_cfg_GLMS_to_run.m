@@ -40,7 +40,7 @@ sets{end+1} = 1;
 % opt.FD_censor.thres = 0.5; 
 sets{end+1} = 1;
 
-% opt.spher_cor = {'AR1' 'fast' 'none'}; 
+% opt.spher_cor = {'AR1' 'FAST' 'none'}; 
 sets{end+1} = 2;
     
 end
