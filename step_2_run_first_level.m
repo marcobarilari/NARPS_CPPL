@@ -160,17 +160,25 @@ for isubj = 1%:nb_subj
             RT_regressors_col = {};
         end
         
-        
-        
-        
         matlabbatch = [];
         
         % set the basic batch for this GLM
         matlabbatch = ...
             subject_level_GLM_batch(matlabbatch, 1, analysis_dir, opt, cfg);
         
+        % for each run
         for iRun = 1:nb_runs
             
+            % create extra conditions (missed trials, button presses, ...)
+            % create missed trial conditions
+            if cfg.rm_unresp_trials.do
+                onsets{iRun} = create_missed_trial_cdt(onsets{iRun}, cfg);
+            end
+            % create button press conditions
+            if cfg.model_button_press
+                onsets{iRun} = create_button_press_cdt(onsets{iRun});
+            end
+
             % adds run specific parameters
             matlabbatch = ...
                 set_session_GLM_batch(matlabbatch, 1, data, iRun, cfg);
@@ -178,7 +186,7 @@ for isubj = 1%:nb_subj
             % adds condition specific parameters for this run
             for iCdt = 1:size(onsets{iRun},2)
                 matlabbatch = ...
-                    set_cdt_GLM_batch(matlabbatch, 1, iRun, onsets{iRun}, cfg);
+                    set_cdt_GLM_batch(matlabbatch, 1, iRun, onsets{iRun}(1,iCdt), cfg);
             end
             
             % adds extra regressors (RT param mod, movement, ...) for this
