@@ -19,7 +19,7 @@ sets{end+1} = 1;
 sets{end+1} = 1;
 
 % opt.model_button_press = [0 1]; 
-sets{end+1} = 2;
+sets{end+1} = 1:2;
 % opt.rm_unresp_trials.do = [0 1];
 sets{end+1} = 2;
 % opt.rm_unresp_trials.thres = .500; 
@@ -33,10 +33,12 @@ sets{end+1} = 1;
 % opt.confounds = {...
 %     {'FramewiseDisplacement', 'WhiteMatter', 'CSF'}, ...
 %     {'X' 'Y' 'Z' 'RotX' 'RotY' 'RotZ'},...
-%     }; 
-sets{end+1} = 1;
+%     {'FramewiseDisplacement', 'WhiteMatter', 'CSF', 'X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ'},...
+%     {'FramewiseDisplacement', 'WhiteMatter', 'CSF', 'X', 'Y', 'Z', 'RotX', 'RotY', 'RotZ' ...
+%         'tCompCor00', 'tCompCor01', 'tCompCor02', 'tCompCor03', 'tCompCor04', 'tCompCor05'},...
+sets{end+1} = 1:4;
 % opt.FD_censor.do = [0 1]; 
-sets{end+1} = 1;
+sets{end+1} = 2;
 % opt.FD_censor.thres = 0.5; 
 sets{end+1} = 1;
 
