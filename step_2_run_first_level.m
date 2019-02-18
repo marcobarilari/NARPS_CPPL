@@ -1,5 +1,5 @@
-% runs subject level on the NARPS data: 
-% This pipeline should allow to run all the possible combinations of options 
+% runs subject level on the NARPS data:
+% This pipeline should allow to run all the possible combinations of options
 % for the GLM: this is currentlyy defined in the set_all_GLMS.m subfunction
 % but should eventually be partly moved out of it.
 
@@ -9,25 +9,20 @@
 %  - get_cfg_GLMS_to_run.m: sets the GLM that will actually be run
 
 % TO DO:
-% - scrubbing
-% - make more verbose
+% opt.RT_correction
+% expected value
+% merge brain masks
 % - send email in case of crash or when finished
-% - do time estimation
-% - how to deal with unresponded trials
-% - run t-contrasts for all the needed condition for the group level
-% - subfunction to create an RT regressor and add it to the design if
-% needed
-% - change inclusive masking 
 % - add parfor loop over subjects (??): remember that parfor over GLM
 % estimation lead to problems. Makes me think this whole thing could be
-% split up in 3 scripts which would make parfor looping easier: 
-%  - one to specify models
-%  - one to estimate them
-%  - one to estimate contrasts
+% split up in 3 scripts which would make parfor looping easier:
+%   - one to specify models
+%   - one to estimate them
+%   - one to estimate contrasts
 
 
 %% parameters
-clear
+clear all
 clc
 
 machine_id = 1;% 0: container ;  1: Remi ;  2: Marco
@@ -36,7 +31,7 @@ filter =  '.*_bold_space-MNI152NLin2009cAsym_preproc.nii$'; % to unzip only the 
 % nb_subjects = 2; % to only try on a couple of subjects; comment out to run on all
 
 
-%% Set options
+%% set options
 opt.task = 'MGT';
 opt.nb_slices = 64;
 opt.TR = 1;
@@ -58,13 +53,12 @@ defaults = spm_get_defaults;
 % listing subjects
 folder_subj = get_subj_list(output_dir);
 folder_subj = cellstr(char({folder_subj.name}')); % turn subject folders into a cellstr
-
 if ~exist('nb_subjects', 'var')
     nb_subjects = numel(folder_subj);
 end
 
 
-%% get data set and analysis info
+%% figure out which GLMs to run
 % set up all the possible of combinations of GLM possible given the
 % different analytical options we have
 [sets] = get_cfg_GLMS_to_run();
@@ -151,8 +145,9 @@ for isubj = 1%:nb_subj
             folder_subj{isubj}, analysis_dir );
         [~, ~, ~] = mkdir(analysis_dir);
         
+        % to remove any previous analysis so that the whole thing does not
+        % crash
         delete(fullfile(analysis_dir,'SPM.mat'))
-        
         
         % define the explicit mask for this GLM if specified
         if cfg.explicit_mask
@@ -161,8 +156,7 @@ for isubj = 1%:nb_subj
             cfg.explicit_mask = '';
         end
         
-        
-        % TO DO
+        % TO DO as not implemented yet
         if cfg.RT_correction
             % specify a dummy GLM to get one regressor for all the RTs
             RT_regressors_col = get_RT_regressor(analysis_dir, data, onsets, opt, cfg);
