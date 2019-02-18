@@ -73,15 +73,10 @@ for isubj = 1%:nb_subj
     subj_dir = fullfile(output_dir, [folder_subj{isubj}], 'func');
 
     
-    %% get explicit mask
-
-    explicit_mask = spm_select('FPList', ...
-        subj_dir ,...
-        ['^' folder_subj{isubj} ...
-        '_task-MGT_run-.*_bold_space-MNI152NLin2009cAsym_brainmask.nii$'] );
-
     
-    %% get runs data
+    %% get explicit mask
+    fprintf(' getting mask\n')
+    explicit_mask = create_mask(subj_dir, folder_subj{isubj});
     
     data = spm_select('FPList', ...
         subj_dir, ...
