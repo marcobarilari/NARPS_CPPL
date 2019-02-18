@@ -71,24 +71,25 @@ for isubj = 1%:nb_subj
     fprintf('running %s\n', folder_subj{isubj})
     
     subj_dir = fullfile(output_dir, [folder_subj{isubj}], 'func');
-
     
     
     %% get explicit mask
     fprintf(' getting mask\n')
     explicit_mask = create_mask(subj_dir, folder_subj{isubj});
     
+
+    %% get data for all runs
+    fprintf(' getting data\n')
     data = spm_select('FPList', ...
         subj_dir, ...
         ['^' folder_subj{isubj} opt.suffix ] );
     data = cellstr(data);
-
+    
     nb_runs = size(data,1);
-
     
-    %%  get data, onsets and extra regressors for each run  
     
-    fprintf(' getting onsets and data\n')
+    %%  get onsets and confounds for each run
+    fprintf(' getting onsets and confounds\n')
     for iRun = 1:nb_runs
 
         % get onsets for all the conditions and blocks as well as each trial caracteristics
@@ -97,41 +98,40 @@ for isubj = 1%:nb_subj
             '_events.tsv');
         onsets{iRun} = spm_load(events_file); %#ok<*SAGROW>
         onsets{iRun}.name = 'gamble_trial';
-        onsets{iRun}.param = {'gain' 'loss'}; %name of the fields to use as parametric factors
-
+        onsets{iRun}.param = {'gain' 'loss' 'EV'}; %name of the fields to use as parametric factors
+        onsets{iRun}.EV = onsets{iRun}.gain./onsets{iRun}.loss; % create an expected value regressor
+        
         % identify missed responses
         onsets = get_cdt_onsets(onsets, iRun);
-
+        
         % list realignement parameters and other fMRIprep data for each run
-        confounds_file = strrep( data{iRun,1}, ...
+        confounds_file = strrep( source_file, ...
             '_space-MNI152NLin2009cAsym_preproc.nii', ...
             '_confounds.tsv');
         confounds{iRun} = spm_load(confounds_file); %#ok<*SAGROW>
-
+        
     end
     
-    
-    %% some sanity check to make sure we have everything
-    % to make sure that we got the data and the RP files
-%     if any(cellfun('isempty', data))
-%         error('Some data is missing: sub-%s - file prefix: %s', ...
-%             subj_ls{isubj}, func_file_prefix)
-%     end
-%     if any(cellfun('isempty', confounds_files))
-%         error('Some realignement parameter is missing: sub-%s', ...
-%             subj_ls{isubj})
-%     end
+    % set this variable aside in case it needs to be used differently for
+    % several analysis
+    onsets_ori = onsets;
     
     
-    %% now we specify the batch and run the GLMs 
+    
+    %% now we specify the batch and run the GLMs
     % or just a subset of GLMs ; see set_all_GLMS.m for more info
     fprintf(' running GLMs\n')
     for iGLM = 1:size(all_GLMs)
         
         tic
-
+        
+        % get onsets
+        onsets = onsets_ori;
+        
         % get configuration for this GLM
         cfg = get_configuration(all_GLMs, opt, iGLM);
+        
+        disp(cfg)
         
         % create the directory for this specific analysis
         analysis_dir = name_analysis_dir(cfg);
