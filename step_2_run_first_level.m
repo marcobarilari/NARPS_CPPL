@@ -42,9 +42,6 @@ opt.slice_reference = 32;
 opt.prefix = smoothing_prefix;
 opt.suffix = filter;
 
-% set defaults for memory usage fot make GLM run faster using subfun/spm_defaults.m
-defaults = spm_get_defaults;
-
 
 %% setting up
 % setting up directories
@@ -66,7 +63,7 @@ end
 
 
 %% for each subject
-for isubj = 1%:nb_subj
+for isubj = 2:nb_subjects
     
     fprintf('running %s\n', folder_subj{isubj})
     
@@ -82,7 +79,7 @@ for isubj = 1%:nb_subj
     fprintf(' getting data\n')
     data = spm_select('FPList', ...
         subj_dir, ...
-        ['^' folder_subj{isubj} opt.suffix ] );
+        ['^' opt.prefix folder_subj{isubj} opt.suffix ] );
     data = cellstr(data);
     
     nb_runs = size(data,1);
@@ -91,9 +88,14 @@ for isubj = 1%:nb_subj
     %%  get onsets and confounds for each run
     fprintf(' getting onsets and confounds\n')
     for iRun = 1:nb_runs
-
+        
+        % get the base name of the func file before it was smoothed
+        source_file = strrep( data{iRun,1}, ...
+            opt.prefix, ...
+            '');
+        
         % get onsets for all the conditions and blocks as well as each trial caracteristics
-        events_file = strrep( data{iRun,1}, ...
+        events_file = strrep( source_file, ...
             '_bold_space-MNI152NLin2009cAsym_preproc.nii', ...
             '_events.tsv');
         onsets{iRun} = spm_load(events_file); %#ok<*SAGROW>
@@ -194,21 +196,20 @@ for isubj = 1%:nb_subj
             matlabbatch = ...
                 set_extra_regress_batch(matlabbatch, 1, iRun, cfg, RT_regressors_col, confounds);
         end
-        
-        % specify design
-        spm_jobman('run', matlabbatch)
-        
-        
+
         % estimate design
-        matlabbatch = [];
-        matlabbatch{1}.spm.stats.fmri_est.spmmat{1,1} = fullfile(analysis_dir, 'SPM.mat');
-        matlabbatch{1}.spm.stats.fmri_est.method.Classical = 1;
-%         spm_jobman('run', matlabbatch)
+        matlabbatch{end+1}.spm.stats.fmri_est.spmmat{1,1} = fullfile(analysis_dir, 'SPM.mat');
+        matlabbatch{end}.spm.stats.fmri_est.method.Classical = 1;
         
+        save(fullfile(analysis_dir,'matlabbatch.mat'), 'matlabbatch')
+        
+        spm_jobman('run', matlabbatch)
+
         % estimate contrasts
-        %         matlabbatch = [];
-        %         matlabbatch = set_t_contrasts(analysis_dir);
-        %         spm_jobman('run', matlabbatch)
+        matlabbatch = [];
+        matlabbatch = set_t_contrasts(analysis_dir);
+        
+        spm_jobman('run', matlabbatch)
         
         toc
         
