@@ -201,7 +201,7 @@ for isubj = 2:nb_subjects
         matlabbatch{end+1}.spm.stats.fmri_est.spmmat{1,1} = fullfile(analysis_dir, 'SPM.mat');
         matlabbatch{end}.spm.stats.fmri_est.method.Classical = 1;
         
-        save(fullfile(analysis_dir,'matlabbatch.mat'), 'matlabbatch')
+        save(fullfile(analysis_dir,'GLM_matlabbatch.mat'), 'matlabbatch')
         
         spm_jobman('run', matlabbatch)
 
@@ -210,6 +210,8 @@ for isubj = 2:nb_subjects
         matlabbatch = set_t_contrasts(analysis_dir);
         
         spm_jobman('run', matlabbatch)
+        
+        save(fullfile(analysis_dir,'contrast_matlabbatch.mat'), 'matlabbatch')
         
         toc
         
