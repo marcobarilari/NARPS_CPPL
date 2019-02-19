@@ -25,7 +25,7 @@
 clear all
 clc
 
-machine_id = 1;% 0: container ;  1: Remi ;  2: Marco
+machine_id = 0;% 0: container ;  1: Remi ;  2: Marco
 smoothing_prefix = 's-6_';
 filter =  '.*_bold_space-MNI152NLin2009cAsym_preproc.nii$'; % to unzip only the files in MNI space
 % nb_subjects = 2; % to only try on a couple of subjects; comment out to run on all
@@ -47,6 +47,10 @@ opt.suffix = filter;
 % setting up directories
 [data_dir, code_dir, output_dir, fMRIprep_DIR] = set_dir(machine_id);
 
+data_dir
+code_dir
+output_dir
+
 % listing subjects
 folder_subj = get_subj_list(output_dir);
 folder_subj = cellstr(char({folder_subj.name}')); % turn subject folders into a cellstr
@@ -63,11 +67,11 @@ end
 
 
 %% for each subject
-for isubj = 2:nb_subjects
+for isubj = 1:nb_subjects
     
     fprintf('running %s\n', folder_subj{isubj})
     
-    subj_dir = fullfile(output_dir, [folder_subj{isubj}], 'func');
+    subj_dir = fullfile(output_dir, [folder_subj{isubj}], 'func')
     
     
     %% get explicit mask

@@ -19,7 +19,7 @@ sets{end+1} = 1;
 sets{end+1} = 1;
 
 % opt.model_button_press = [0 1]; 
-sets{end+1} = 1:2;
+sets{end+1} = 2;
 % opt.rm_unresp_trials.do = [0 1];
 sets{end+1} = 2;
 % opt.rm_unresp_trials.thres = .500; 
