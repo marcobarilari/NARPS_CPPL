@@ -1,7 +1,7 @@
 global defaults
-defaults.stats.maxmem = 2^28;
+defaults.stats.maxmem = 2^30;
 
-% 
+%
 % function spm_defaults
 % % Set the defaults which are used by SPM
 % %__________________________________________________________________________
@@ -25,17 +25,17 @@ defaults.stats.maxmem = 2^28;
 % %                 ** This file should not be edited **
 % %__________________________________________________________________________
 % % Copyright (C) 1994-2018 Wellcome Trust Centre for Neuroimaging
-% 
+%
 % % SPM
 % % $Id: spm_defaults.m 7296 2018-04-18 10:36:49Z guillaume $
-% 
-% 
+%
+%
 % global defaults
-% 
+%
 % % Command Line Usage default
 % %==========================================================================
 % defaults.cmdline  = 0;
-% 
+%
 % % User Interface defaults
 % %==========================================================================
 % defaults.ui.monitor = NaN;
@@ -43,7 +43,7 @@ defaults.stats.maxmem = 2^28;
 % defaults.ui.fs      = 14;  % unused
 % defaults.ui.print   = 'ps';
 % defaults.renderer   = 'opengl';
-% 
+%
 % % File format specific
 % %==========================================================================
 % % Note that defaults.analyze.flip is no longer used.  Specifying the
@@ -51,15 +51,15 @@ defaults.stats.maxmem = 2^28;
 % % spm_flip_analyze_images.m
 % defaults.images.format  = 'nii'; % options: 'img', 'nii'
 % defaults.mat.format     = '-v6'; % options: '-mat', '-v6', '-v7.0', '-v7.3'
-% 
+%
 % % Toolboxes defaults
 % %==========================================================================
 % defaults.tbx.dir = { fullfile(spm('Dir'),'toolbox') };
-% 
+%
 % % DICOM Import defaults
 % %==========================================================================
 % defaults.dicom.root = 'flat'; % Folder hierarchy
-% 
+%
 % % fMRI design defaults
 % %==========================================================================
 % defaults.stats.fmri.t   = 16;
@@ -67,11 +67,11 @@ defaults.stats.maxmem = 2^28;
 % defaults.stats.fmri.hpf = 128;
 % defaults.stats.fmri.cvi = 'AR(1)';
 % defaults.stats.fmri.hrf = [6 16 1 1 6 0 32];
-% 
+%
 % % Mask defaults
 % %==========================================================================
 % defaults.mask.thresh    = 0.8;
-% 
+%
 % % Stats defaults
 % %==========================================================================
 % defaults.stats.maxmem      = 2^32;
@@ -87,7 +87,7 @@ defaults.stats.maxmem = 2^28;
 % defaults.stats.results.svc.distmin    =  4;
 % defaults.stats.results.svc.nbmax      = 16;
 % defaults.stats.results.mipmat         = {fullfile(spm('dir'),'MIP.mat')};
-% 
+%
 % % Filename prefix defaults
 % %==========================================================================
 % defaults.slicetiming.prefix           = 'a';
@@ -98,7 +98,7 @@ defaults.stats.maxmem = 2^28;
 % defaults.deformations.modulate.prefix = 'm';
 % defaults.smooth.prefix                = 's';
 % defaults.imcalc.prefix                = 'i';
-% 
+%
 % % Realignment defaults
 % %==========================================================================
 % defaults.realign.estimate.quality = 0.9;
@@ -111,7 +111,7 @@ defaults.stats.maxmem = 2^28;
 % defaults.realign.write.interp     = 4;
 % defaults.realign.write.wrap       = [0 0 0];
 % defaults.realign.write.which      = [2 1];
-% 
+%
 % % Unwarp defaults
 % %==========================================================================
 % defaults.unwarp.estimate.rtm      = 0;
@@ -128,7 +128,7 @@ defaults.stats.maxmem = 2^28;
 % %
 % % Unwarp uses defaults.realign.write defaults for writing.
 % %
-% 
+%
 % % Coregistration defaults
 % %==========================================================================
 % defaults.coreg.estimate.cost_fun = 'nmi';
@@ -138,14 +138,14 @@ defaults.stats.maxmem = 2^28;
 % defaults.coreg.write.interp      = 4;
 % defaults.coreg.write.wrap        = [0 0 0];
 % defaults.coreg.write.mask        = 0;
-% 
+%
 % % Spatial Normalisation defaults
 % %==========================================================================
 % defaults.normalise.write.preserve   = 0;
 % defaults.normalise.write.bb         = [[-78 -112 -70];[78 76 85]];
 % defaults.normalise.write.vox        = [2 2 2];
 % defaults.normalise.write.interp     = 4;
-% 
+%
 % % Old Spatial Normalisation defaults
 % %==========================================================================
 % defaults.old.normalise.estimate.smosrc  = 8;
@@ -161,7 +161,7 @@ defaults.stats.maxmem = 2^28;
 % defaults.old.normalise.write.interp     = 1;
 % defaults.old.normalise.write.wrap       = [0 0 0];
 % defaults.old.normalise.write.prefix     = 'w';
-% 
+%
 % % VBM Preprocessing defaults
 % %==========================================================================
 % defaults.old.preproc.tpm     = cellstr(char(...
@@ -181,12 +181,12 @@ defaults.stats.maxmem = 2^28;
 % defaults.old.preproc.output.CSF     = [0 0 0];
 % defaults.old.preproc.output.biascor = 1;
 % defaults.old.preproc.output.cleanup = 0;
-% 
+%
 % % Smooth defaults
 % %==========================================================================
 % defaults.smooth.fwhm = [8 8 8];
-% 
-% 
+%
+%
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %-Prevent users from making direct calls to spm_defaults
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -202,7 +202,7 @@ defaults.stats.maxmem = 2^28;
 %         end
 %     end
 % end
-% 
+%
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %-Execute user-specified defaults files
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
