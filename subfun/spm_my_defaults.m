@@ -1,5 +1,5 @@
 global defaults
-defaults.stats.maxmem = 2^30;
+defaults.stats.maxmem = 2^28;
 
 % 
 % function spm_defaults
