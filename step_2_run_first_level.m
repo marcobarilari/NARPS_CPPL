@@ -101,7 +101,17 @@ for isubj = 2:nb_subjects
         onsets{iRun} = spm_load(events_file); %#ok<*SAGROW>
         onsets{iRun}.name = 'gamble_trial';
         onsets{iRun}.param = {'gain' 'loss' 'EV'}; %name of the fields to use as parametric factors
-        onsets{iRun}.EV = onsets{iRun}.gain./onsets{iRun}.loss; % create an expected value regressor
+        
+        % compute euclidian distance to the indifference line defined by
+        % gain twice as big as losses
+        % https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
+        a = 0.5; 
+        b = -1;
+        c = 0;
+        x = onsets{iRun}.gain;
+        y = onsets{iRun}.loss;
+        dist = abs(a * x + b * y + c) / (a^2 + b^2)^.5;
+        onsets{iRun}.EV = dist; % create an "expected value" regressor
         
         % identify missed responses
         onsets = get_cdt_onsets(onsets, iRun);
