@@ -1,5 +1,7 @@
 %  This script uses the report from MRIQC (bold and T1) identify outliers using
 %  robust statistics (interquartile range).
+% https://mriqc.readthedocs.io/en/stable/iqms/bold.html
+% https://mriqc.readthedocs.io/en/stable/iqms/t1w.html
 
 
 %% Load MRIQC reports
@@ -44,7 +46,7 @@ BOLD = spm_load(MRIQC_BOLD_file);
 %   due to hyper-intensity of the carotid vessels and fat. Values should 
 %   be around the interval [0.6, 0.8].
 
-clear field_names
+clear field_names outliers_T1w
 
 field_names(1).name = 'cjv';
 field_names(1).flip = false;
@@ -84,7 +86,7 @@ field_names(end).unilateral = true;
 
 field_names(end+1).name = 'inu_med';
 field_names(end).flip = false;
-field_names(end).unilateral = false;
+field_names(end).unilateral = true;
 
 field_names(end+1).name = 'wm2max';
 field_names(end).flip = false;
@@ -102,9 +104,9 @@ for i_field = 1:numel(field_names)
     end
     % determines if threshold is unilateral or bilateral
     if field_names(i_field).unilateral
-        unilat = 1;
-    else
         unilat = 2;
+    else
+        unilat = 1;
     end
     
     % identifies outliers.
@@ -119,19 +121,19 @@ T1w.bids_name(sum(outliers_T1w, 2)>0)
 
 % efc =  Entropy-focus criterion ; Lower values are better.
 % fber = Foreground-Background energy ratio ;  Higher values are better.
-% DVARS
+% DVARS = "signal variability"
 %   dvars_nstd
 %   dvars_std
 %   dvars_vstd
-% fd_perc
-% fd_mean
+% fd_perc: framewise diplacement - percentage of time points above 0.2 mm
+% fd_mean: mean framewise diplacement
 % gsr = Ghost to Signal Ratio 
 % aor = AFNI’s outlier ratio - Mean fraction of outliers per fMRI 
 %   volume as given by AFNI’s 3dToutcount.
-% snr = SNR
+% snr = signal to noise ratio
 % tsnr = Temporal SNR
 
-clear field_names
+clear field_names outliers_BOLD
 
 field_names(1).name = 'aor';
 field_names(end).flip = false;
@@ -191,9 +193,9 @@ for i_field = 1:numel(field_names)
         tmp = tmp * -1;
     end
     if field_names(i_field).unilateral
-        unilat = 1;
-    else
         unilat = 2;
+    else
+        unilat = 1;
     end
     
     [outliers_BOLD(:,i_field)] = iqr_method(tmp, unilat); 

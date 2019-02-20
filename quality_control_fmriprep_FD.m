@@ -1,5 +1,7 @@
 %  This script uses the report from MRIQC (bold and T1) identify outliers using
 %  robust statistics (interquartile range).
+% https://fmriprep.readthedocs.io/en/stable/outputs.html
+
 clear
 clc
 
@@ -59,13 +61,20 @@ for i_group = 1:2
     else
         group_name = 'equal range';
     end
-    
-    figure('name', ['Framewise Displacement - ' group_name])
 
-    hold on
     
     proportion = sum(FramewiseDisplacement{i_group} > thresh) ...
         / size(FramewiseDisplacement{i_group},1);
+    
+    summed_proportion = sum(reshape(proportion, [4, size(proportion,2)/4]));
+    
+    
+    
+    
+    %%
+    figure('name', ['Framewise Displacement - ' group_name])
+
+    hold on
     
     bar(1.5:216.5, proportion)
     plot([1.5 216.5], [.1 .1], '--r') % plot limit at 10% of time points
@@ -84,6 +93,29 @@ for i_group = 1:2
         'fontsize', 8)
     
     axis([1 216 0 0.25])
+    
+    %%
+    figure('name', ['Framewise Displacement - ' group_name])
+
+    hold on
+    
+    bar(1:54, summed_proportion)
+    plot([1 54], [.1 .1], '--r') % plot limit at 10% of time points
+    
+    title(group_name)
+    ylabel(sprintf('summed of proportions per run of time points FD > %0.1f mm', thresh))
+    xlabel('subject')
+    
+    x_tick_label = char(participants.participant_id(group_id==(i_group-1)));
+    x_tick_label = x_tick_label(:,5:end);
+
+    set(gca, 'xtick', 1:size(FramewiseDisplacement{1},2), ...
+        'xticklabel', x_tick_label, ...
+        'ytick', 0:.05:.5, ...
+        'yticklabel', 0:.05:.5, ...
+        'fontsize', 8)
+    
+    axis([.5 54.5 0 0.25])
     
 end
 
