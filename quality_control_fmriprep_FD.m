@@ -4,7 +4,7 @@ clear
 clc
 
 %%
-thresh = 0.4; %FD threshold to "censor" timepoints
+thresh = 0.5; %FD threshold to "censor" timepoints
 
 %% Load fMRIprep confound reports
 % stores only the FD values and separates them into 2 groups
