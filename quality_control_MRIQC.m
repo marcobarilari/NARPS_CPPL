@@ -1,9 +1,13 @@
+%  This script uses the report from MRIQC (bold and T1) identify outliers using
+%  robust statistics (interquartile range).
+
+
 %% Load MRIQC reports
 clear 
 clc
 
-machine_id = 1;
-[data_dir, code_dir, output_dir, fMRIprep_DIR] = set_dir(machine_id);
+code_dir = pwd;
+[~]  = addpath(fullfile(code_dir,'subfun'));
 
 MRIQC_T1w_file = fullfile(code_dir, 'inputs', 'mriqc','group_T1w.tsv');
 MRIQC_BOLD_file = fullfile(code_dir, 'inputs', 'mriqc','group_BOLD.tsv');
@@ -13,6 +17,13 @@ BOLD = spm_load(MRIQC_BOLD_file);
 
 
 %% T1
+% This loads metrics from the T1
+% The iqr_method sub-function indentifies outliers that are higher than a
+% certain value (unilateral) or within a certain range (bilateral).
+% So each metric of interest can be "switched" (if higher values mean
+% better quality like for SNR) and can be thresholded unilateraly of not.
+% What follows is a list of the different metric used for T1 (mostly copy
+% pasta from the MRIQC docs)
 
 % CJV = coefficient of joint variation ; Lower values are better.
 % CNR = contrast-to-noise ratio ; Higher values indicate better quality.
@@ -82,17 +93,21 @@ field_names(end).unilateral = false;
 % check robust outliers for each MRIQC metric
 for i_field = 1:numel(field_names)
     
+    % get the values for each metric of interest
     tmp = getfield(T1w, field_names(i_field).name);
     
+    % flips it if higher values mean better 
     if field_names(i_field).flip
         tmp = tmp * -1;
     end
+    % determines if threshold is unilateral or bilateral
     if field_names(i_field).unilateral
         unilat = 1;
     else
         unilat = 2;
     end
     
+    % identifies outliers.
     [outliers_T1w(:,i_field)] = iqr_method(tmp, unilat); %#ok<SAGROW>
 end
 
@@ -100,6 +115,7 @@ end
 T1w.bids_name(sum(outliers_T1w, 2)>0)
 
 %% BOLD
+%  same as for T1
 
 % efc =  Entropy-focus criterion ; Lower values are better.
 % fber = Foreground-Background energy ratio ;  Higher values are better.
