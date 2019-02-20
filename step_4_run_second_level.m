@@ -1,31 +1,65 @@
 % runs group level on the McGurk experiment and export the results corresponding to those
 % published in the NIDM format
 
-% t-test
-% all events > baseline
-% all blocks > baseline
+% Parametric effect of gain:
+% 
+% Positive effect in ventromedial PFC - for the equal indifference group
+% Positive effect in ventromedial PFC - for the equal range group
+% Positive effect in ventral striatum - for the equal indifference group
+% Positive effect in ventral striatum - for the equal range group
+
+% Parametric effect of loss:
+% 
+% Negative effect in VMPFC - for the equal indifference group
+% Negative effect in VMPFC - for the equal range group
+% Positive effect in amygdala - for the equal indifference group
+% Positive effect in amygdala - for the equal range group
+
+% Equal range vs. equal indifference:
+% 
+% Greater positive response to losses in amygdala for equal range condition vs. equal indifference condition.
+
 
 %% parameters
-clear all
+clear
 clc
 
-machine_id = 0;% 0: container ;  1: Remi ;  2: Marco
+machine_id = 1;% 0: container ;  1: Remi ;  2: Marco
+
+subj_to_exclude = {
+    'sub-002';...
+    'sub-009'};
 
 
 %% setting up
 % setting up directories
 [data_dir, code_dir, output_dir, fMRIprep_DIR] = set_dir(machine_id);
 
-data_dir
-code_dir
-output_dir
+output_dir = 'E:\ds001205\derivatives\spm12';
+output_dir %#ok<NOPTS>
 
 % listing subjects
 folder_subj = get_subj_list(output_dir);
 folder_subj = cellstr(char({folder_subj.name}')); % turn subject folders into a cellstr
-if ~exist('nb_subjects', 'var')
-    nb_subjects = numel(folder_subj);
-end
+
+opt = [];
+
+% Get which participant is in which group
+participants_file = fullfile(code_dir, 'inputs', 'event_tsvs','participants.tsv');
+participants = spm_load(participants_file);
+group_id = strcmp(participants.group, 'equalRange');
+
+% Remove excluded subjects
+to_remove = ismember(participants.participant_id, subj_to_exclude);
+group_id(to_remove) = [];
+participants.participant_id(to_remove) = [];
+participants.group(to_remove) = [];
+participants.gender(to_remove) = [];
+participants.age(to_remove) = [];
+
+to_remove = ismember(folder_subj, subj_to_exclude);
+folder_subj(to_remove) = [];
+nb_subj = numel(folder_subj);
 
 
 %% figure out which GLMs to run
@@ -37,32 +71,33 @@ end
 
 %%
 cdt_ls = {...
-    'mcgurk_con_aud', ...
-    'mcgurk_con_fus', ...
-    'mcgurk_con_other', ...
-    'mcgurk_inc_aud', ...
-    'mcgurk_inc_fus', ...
-    'mcgurk_inc_other', ...
-    'con_aud_vis', ...
-    'con_other', ...
-    'inc_aud', ...
-    'inc_vis', ...
-    'inc_other', ...
-    'missed', ...
-    'con_block', ...
-    'inc_block'};
+    ' gamble_trial*bf(1) > 0'; ...
+    ' gamble_trial*bf(1) < 0'; ...
+    ' gamble_trialxgain^1*bf(1) > 0'; ...
+    ' gamble_trialxgain^1*bf(1) < 0'; ...
+    ' gamble_trialxloss^1*bf(1) > 0'; ...
+    ' gamble_trialxloss^1*bf(1) < 0'; ...
+    ' gamble_trialxEV^1*bf(1) > 0'; ...
+    ' gamble_trialxEV^1*bf(1) < 0'; ...
+    ' missed_trial*bf(1) > 0'; ...
+    ' missed_trial*bf(1) < 0'; ...
+    ' gamble_trial_button_press*bf(1) > 0'; ...
+    ' gamble_trial_button_press*bf(1) < 0'};
 
 contrast_ls = {...
-    ' con_aud_vis', ...
-    ' inc_aud', ...
-    ' mcgurk_con_aud', ...
-    ' mcgurk_con_fus', ...
-    ' mcgurk_inc_aud', ...
-    ' mcgurk_inc_fus', ...
-    ' con_block', ...
-    ' inc_block', ...
-    'all_events', ...
-    'all_blocks'};
+    'gamble_trial>0'; ...
+    'gamble_trial<0'; ...
+    'gamble_trialxgain>0'; ...
+    'gamble_trialxgain<0'; ...
+    'gamble_trialxloss>0'; ...
+    'gamble_trialxloss<0'; ...
+    'gamble_trialxEV>0'; ...
+    'gamble_trialxEV<0'; ...
+    'missed_trial>0'; ...
+    'missed_trial<0'; ...
+    'gamble_trial_button_press>0'; ...
+    'gamble_trial_button_press<0'};
+
 
 %%
 for iGLM = 1:size(all_GLMs)
@@ -72,42 +107,23 @@ for iGLM = 1:size(all_GLMs)
     
     % set output dir for this GLM configutation
     analysis_dir = name_analysis_dir(cfg);
-    grp_lvl_dir = fullfile (OUTPUT_DIR, analysis_dir );
+    grp_lvl_dir = fullfile (output_dir, 'group', analysis_dir );
     mkdir(grp_lvl_dir)
     
     contrasts_file_ls = struct('con_name', {}, 'con_file', {});
+
     
-    nb_events = {};
-    
-    %%
+    %% list the fiels 
     for isubj = 1:nb_subj
 
+%         subj_lvl_dir = fullfile ( ...
+%             output_dir, folder_subj{isubj}, analysis_dir);
+        
         subj_lvl_dir = fullfile ( ...
-            OUTPUT_DIR, '..', ...
-            ['sub-' subj_ls{isubj}], analysis_dir);
+            output_dir, folder_subj{isubj});
+
         
         load(fullfile(subj_lvl_dir, 'SPM.mat'))
-        
-        %% Count how many events for each condition / session / subject
-        for iCdt = 1:numel(cdt_ls)
-            
-            nb_events{iCdt, isubj} = []; %#ok<SAGROW>
-            
-            for iSess = 1:numel(SPM.Sess)
-                
-                cdt_in_sess = cat(1,SPM.Sess(iSess).U(:).name);
-                cdt_idx = contains(cdt_in_sess, cdt_ls{iCdt});
-                
-                if any(cdt_idx)
-                    nb_event_this_sess = numel(SPM.Sess(iSess).U(cdt_idx).ons);
-                else
-                    nb_event_this_sess = 0;
-                end
-                
-                nb_events{iCdt, isubj}(end+1) = nb_event_this_sess;
-                
-            end
-        end
         
         %% Stores names of the contrast images
         for iCtrst = 1:numel(contrast_ls)
