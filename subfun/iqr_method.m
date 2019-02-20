@@ -25,6 +25,7 @@ if nargin == 1
 end
 
 a=a(:);n=length(a);
+
 % inter-quartile range
 j=floor(length(a)/4 + 5/12);
 y=sort(a);
@@ -33,6 +34,7 @@ q1=(1-g).*y(j)+g.*y(j+1);
 k=length(a)-j+1;
 q2=(1-g).*y(k)+g.*y(k-1);
 value=q2-q1;
+
 % outliers
 M = median(a);
 k=(17.63*n-23.64)/(7.74*n-3.71);

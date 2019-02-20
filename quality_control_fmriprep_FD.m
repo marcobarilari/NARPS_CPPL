@@ -30,6 +30,7 @@ for i_group = 0:1 %loop through each group
             % load each event file
             data = spm_load(files_2_load(i_file, :));
             
+            % collect the FD for each run / subject
             FramewiseDisplacement{i_group+1}(:,end+1) =  ...
                 data.FramewiseDisplacement;
             
@@ -48,7 +49,7 @@ end
 %% plot proportion datapoint with Framewise Displacement > threshold
 close all
 
-thresh = 0.4;
+thresh = 0.5;
 
 for i_group = 1:2
     
