@@ -2,21 +2,21 @@
 % published in the NIDM format
 
 % Parametric effect of gain:
-% 
+%
 % Positive effect in ventromedial PFC - for the equal indifference group
 % Positive effect in ventromedial PFC - for the equal range group
 % Positive effect in ventral striatum - for the equal indifference group
 % Positive effect in ventral striatum - for the equal range group
 
 % Parametric effect of loss:
-% 
+%
 % Negative effect in VMPFC - for the equal indifference group
 % Negative effect in VMPFC - for the equal range group
 % Positive effect in amygdala - for the equal indifference group
 % Positive effect in amygdala - for the equal range group
 
 % Equal range vs. equal indifference:
-% 
+%
 % Greater positive response to losses in amygdala for equal range condition vs. equal indifference condition.
 
 
@@ -26,9 +26,11 @@ clc
 
 machine_id = 1;% 0: container ;  1: Remi ;  2: Marco
 
-subj_to_exclude = {
-    'sub-002';...
-    'sub-009'};
+% subj_to_exclude = {
+%     'sub-002';...
+%     'sub-009'};
+
+subj_to_exclude = {};
 
 
 %% setting up
@@ -36,7 +38,7 @@ subj_to_exclude = {
 [data_dir, code_dir, output_dir, fMRIprep_DIR] = set_dir(machine_id);
 
 output_dir = 'E:\ds001205\derivatives\spm12';
-output_dir %#ok<NOPTS>
+output_dir 
 
 % listing subjects
 folder_subj = get_subj_list(output_dir);
@@ -111,19 +113,19 @@ for iGLM = 1:size(all_GLMs)
     mkdir(grp_lvl_dir)
     
     contrasts_file_ls = struct('con_name', {}, 'con_file', {});
-
     
-    %% list the fiels 
+    
+    %% list the fiels
     for isubj = 1:nb_subj
-
-%         subj_lvl_dir = fullfile ( ...
-%             output_dir, folder_subj{isubj}, analysis_dir);
+        
+        %         subj_lvl_dir = fullfile ( ...
+        %             output_dir, folder_subj{isubj}, analysis_dir);
         
         subj_lvl_dir = fullfile ( ...
             output_dir, folder_subj{isubj});
-
         
         load(fullfile(subj_lvl_dir, 'SPM.mat'))
+        
         
         %% Stores names of the contrast images
         for iCtrst = 1:numel(contrast_ls)
@@ -137,40 +139,96 @@ for iGLM = 1:size(all_GLMs)
         end
         
     end
-
     
-    %% EVENTS
-    % paired ttest con_aud VS inc_aud
-    cdts = {'con_aud_vis', 'inc_aud'};
-    ctrsts = {' con_aud_vis', ' inc_aud'};
     
-    subj_to_include = find_subj_to_include(cdt_ls, cdts, nb_events);
-    scans = scans_for_grp_lvl(contrast_ls, ctrsts, contrasts_file_ls, subj_to_include);
+    %% ttest
+    for i_ttest = 1:3
+        
+        switch i_ttest
+            case 1
+                % Parametric effect of gain:
+                % Positive effect
+                cdts = {' gamble_trialxgain^1*bf(1) > 0'}; %#ok<*NASGU>
+                ctrsts = {'gamble_trialxgain>0'};
+                subdir_name = 'gamble_trialxgain_sup_baseline';
+                
+            case 2
+                % Parametric effect of loss:
+                %
+                % Negative effect
+                cdts = {' gamble_trialxloss^1*bf(1) < 0'};
+                ctrsts = {'gamble_trialxloss<0'};
+                subdir_name = 'gamble_trialxloss_inf_baseline';
+                
+            case 3
+                % Positive effect
+                cdts = {' gamble_trialxloss^1*bf(1) > 0'};
+                ctrsts = {'gamble_trialxloss>0'};
+                subdir_name = 'gamble_trialxloss_sup_baseline';
+        end
+        
+        ctrsts %#ok<*NOPTS>
+        
+        for iGroup = 1:2
+            
+            if iGroup==1
+                grp_name = 'equalRange';
+                subj_to_include = find(group_id(1:nb_subj)==1);
+            else
+                grp_name = 'equalIndifference';
+                subj_to_include = find(group_id(1:nb_subj)==0);
+            end
+            
+            grp_name
+            
+            % identify the right con images for each subject to bring to
+            % the grp lvl as summary stat
+            
+            scans = scans_for_grp_lvl(contrast_ls, ctrsts, contrasts_file_ls, subj_to_include);
+            
+            scans'
+            
+            matlabbatch = [];
+%             matlabbatch = set_ttest_batch(matlabbatch, ...
+%                 fullfile(grp_lvl_dir, grp_name), ...
+%                 scans, ...
+%                 {subdir_name}, ...
+%                 {'>'});
+%             
+%             spm_jobman('run', matlabbatch)
+        end
+        
+    end
+    
+    %% two sample ttest
 
+    % Equal range vs. equal indifference:
+    %
+    % Greater positive response to losses in amygdala for equal range condition vs. equal indifference condition.
+    
+    % Positive effect
+    cdts = {' gamble_trialxloss^1*bf(1) > 0'};
+    ctrsts = {'gamble_trialxloss>0'};
+    subdir_name = 'loss_sup_baseline_range_sup_indiff';
+    
+    % identify the right con images for each subject to bring to
+    % the grp lvl as summary stat
+    subj_to_include = find(group_id(1:nb_subj)==1);
+    scans1 = scans_for_grp_lvl(contrast_ls, ctrsts, contrasts_file_ls, subj_to_include)
+    
+    subj_to_include = find(group_id(1:nb_subj)==0);
+    scans2 = scans_for_grp_lvl(contrast_ls, ctrsts, contrasts_file_ls, subj_to_include)
+
+    scans{1,1} =  scans1;
+    scans{2,1} =  scans2;
+    
     matlabbatch = [];
-    matlabbatch = set_ttest_batch(matlabbatch, grp_lvl_dir, scans, ...
-        {'CON_aud', 'INC_aud'}, ...
-        {'>','<','+>'});
+    matlabbatch = set_ttest_batch(matlabbatch, ...
+        fullfile(grp_lvl_dir), ...
+        scans, ...
+        {subdir_name}, ...
+        {'>'});
     
     spm_jobman('run', matlabbatch)
-    
-    
-    % ttest for all events
-    ctrsts = {'all_events'};
-    subj_to_include = 1:nb_subj;
-
-    scans = scans_for_grp_lvl(contrast_ls, ctrsts, contrasts_file_ls, subj_to_include);
-
-    matlabbatch = [];
-    matlabbatch = set_ttest_batch(matlabbatch, grp_lvl_dir, scans, ...
-            {'all_events'}, ...
-            {'>','<'});
-    
-    spm_jobman('run', matlabbatch)
-    
-    
-    
-
-    
     
 end

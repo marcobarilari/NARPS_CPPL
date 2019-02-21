@@ -12,13 +12,6 @@ matlabbatch{2}.spm.stats.fmri_est.spmmat(1) = ...
 matlabbatch{2}.spm.stats.fmri_est.write_residuals = 0;
 matlabbatch{2}.spm.stats.fmri_est.method.Classical = 1;
 
-matlabbatch{2}.spm.stats.fmri_est.spmmat(1) = ...
-    cfg_dep('Factorial design specification: SPM.mat File', ...
-    substruct('.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}), ...
-    substruct('.','spmmat'));
-matlabbatch{2}.spm.stats.fmri_est.write_residuals = 0;
-matlabbatch{2}.spm.stats.fmri_est.method.Classical = 1;
-
 
 %% set contrasts
 matlabbatch{3}.spm.stats.con.spmmat(1) = ...
@@ -38,50 +31,81 @@ matlabbatch{3}.spm.stats.con.delete = 0;
 
 
 %% save contrasts as NIDM results
-matlabbatch{4}.spm.stats.results.spmmat(1) = ...
-    cfg_dep('Contrast Manager: SPM.mat File', ...
-    substruct('.','val', '{}',{3}, '.','val', '{}',{1}, '.','val', '{}',{1}), ...
-    substruct('.','spmmat'));
-
-for iCmp = 1:numel(cmp)
-    name = name_weight_contrast(cmp{iCmp}, cdts, scans);
-    matlabbatch{4}.spm.stats.results.conspec(iCmp).titlestr = name;
-    matlabbatch{4}.spm.stats.results.conspec(iCmp).contrasts = iCmp;
-    matlabbatch{4}.spm.stats.results.conspec(iCmp).threshdesc = 'none';
-    matlabbatch{4}.spm.stats.results.conspec(iCmp).thresh = p;
-    matlabbatch{4}.spm.stats.results.conspec(iCmp).extent = k;
-    matlabbatch{4}.spm.stats.results.conspec(iCmp).conjunction = 1;
-    matlabbatch{4}.spm.stats.results.conspec(iCmp).mask.none = 1;
-end
-
-matlabbatch{4}.spm.stats.results.units = 1;
-matlabbatch{4}.spm.stats.results.export{1}.ps = true;
-matlabbatch{4}.spm.stats.results.export{2}.nidm.modality = 'FMRI';
-matlabbatch{4}.spm.stats.results.export{2}.nidm.refspace = 'icbm';
-matlabbatch{4}.spm.stats.results.export{2}.nidm.group.nsubj = numel(scans);
-matlabbatch{4}.spm.stats.results.export{2}.nidm.group.label = 'ctrl';
+% matlabbatch{4}.spm.stats.results.spmmat(1) = ...
+%     cfg_dep('Contrast Manager: SPM.mat File', ...
+%     substruct('.','val', '{}',{3}, '.','val', '{}',{1}, '.','val', '{}',{1}), ...
+%     substruct('.','spmmat'));
+% 
+% for iCmp = 1:numel(cmp)
+%     name = name_weight_contrast(cmp{iCmp}, cdts, scans);
+%     matlabbatch{4}.spm.stats.results.conspec(iCmp).titlestr = name;
+%     matlabbatch{4}.spm.stats.results.conspec(iCmp).contrasts = iCmp;
+%     matlabbatch{4}.spm.stats.results.conspec(iCmp).threshdesc = 'none';
+%     matlabbatch{4}.spm.stats.results.conspec(iCmp).thresh = p;
+%     matlabbatch{4}.spm.stats.results.conspec(iCmp).extent = k;
+%     matlabbatch{4}.spm.stats.results.conspec(iCmp).conjunction = 1;
+%     matlabbatch{4}.spm.stats.results.conspec(iCmp).mask.none = 1;
+% end
+% 
+% matlabbatch{4}.spm.stats.results.units = 1;
+% matlabbatch{4}.spm.stats.results.export{1}.ps = true;
+% matlabbatch{4}.spm.stats.results.export{2}.nidm.modality = 'FMRI';
+% matlabbatch{4}.spm.stats.results.export{2}.nidm.refspace = 'icbm';
+% matlabbatch{4}.spm.stats.results.export{2}.nidm.group.nsubj = numel(scans);
+% matlabbatch{4}.spm.stats.results.export{2}.nidm.group.label = 'ctrl';
 
 
 end
 
 function [name, weights] = name_weight_contrast(cmp, cdts, scans)
 
-switch numel(cdts)
-    case 1
-        cdt_1 = cdts{1};
-        cdt_2 = 'baseline';
-    case 2
-        cdt_1 = cdts{1};
-        cdt_2 = cdts{2};
-    case 4
+
+%% set design
+if size(scans,1) == 2
+    test_type = 'two-sample';
+elseif numel(cdts)==1
+    test_type = 'ttest';
+elseif numel(cdts)==2
+    test_type = 'paired';
+else
+    test_type = 'anova';
 end
 
-% for ttest and paired ttest
-if numel(cmp)<3 
+switch test_type
+    
+    case 'two-sample'
+        
+        cdt_1 = cdts{1};
+        cdt_2 = '';
+    
+    case 'ttest'
+        cdt_1 = cdts{1};
+        cdt_2 = 'baseline';
+        
+    case 'paired'
+        cdt_1 = cdts{1};
+        cdt_2 = cdts{2};
+
+    case 'anova'
+        
+        if strcmp(cmp{2},'>')
+            
+            name = cmp{4};
+            weights = [];
+            weights(cmp{1}) = 1;
+            weights(cmp{3}) = -1;
+            weights = [weights zeros(1, numel(scans))];
+            
+        end
+end
+
+% for ttest
+if ~strcmp(test_type, 'anova')
     
     switch cmp
         
-        % for condition 1 > condition 2
+        % applied to groups as
+        % for condition  1 > condition 2
         case '>'
             name = [cdt_1 ' > ' cdt_2];
             weights = [1 -1 zeros(1, numel(scans))];
@@ -96,25 +120,17 @@ if numel(cmp)<3
             name = [cdt_1 ' + ' cdt_2 ' > baseline'];
             weights = [0.5 0.5 ones(1, numel(scans))/numel(scans) ];
     end
-    
-    % adjust weight vector length in case it is a ttest
-    if numel(cdts)==1
-        weights(2:end) = [];
-    end
 
-% for anova
-elseif numel(cmp)==4
-    
-    if strcmp(cmp{2},'>')
-        
-        name = cmp{4};
-        weights = [];
-        weights(cmp{1}) = 1;
-        weights(cmp{3}) = -1;
-        weights = [weights zeros(1, numel(scans))];
-        
-    end
-    
+end
+
+% adjust weight vector length in case it is a ttest
+if strcmp(test_type, 'ttest')
+    weights(2:end) = [];
+end
+
+% adjust weight vector length in case it is a ttest
+if strcmp(test_type, 'two-sample')
+    weights(3:end) = [];
 end
 
 
