@@ -38,7 +38,7 @@ subj_to_exclude = {};
 [data_dir, code_dir, output_dir, fMRIprep_DIR] = set_dir(machine_id);
 
 output_dir = 'E:\ds001205\derivatives\spm12';
-output_dir 
+output_dir
 
 % listing subjects
 folder_subj = get_subj_list(output_dir);
@@ -142,7 +142,7 @@ for iGLM = 1:size(all_GLMs)
     
     
     %% ttest
-    for i_ttest = 1:3
+    for i_ttest = 1:5
         
         switch i_ttest
             case 1
@@ -165,6 +165,19 @@ for iGLM = 1:size(all_GLMs)
                 cdts = {' gamble_trialxloss^1*bf(1) > 0'};
                 ctrsts = {'gamble_trialxloss>0'};
                 subdir_name = 'gamble_trialxloss_sup_baseline';
+                
+            case 4
+                % Positive control on effect of gamble trials themselves
+                cdts = {' gamble_trial*bf(1) > 0'};
+                ctrsts = {'gamble_trial>0'};
+                subdir_name = 'gamble_trial_sup_baseline';
+                
+            case 5
+                % Positive control on effect of button presses
+                cdts = {' gamble_trial_button_press*bf(1) > 0'};
+                ctrsts = {'gamble_trial_button_press>0'};
+                subdir_name = 'gamble_trial_button_press_sup_baseline';
+                
         end
         
         ctrsts %#ok<*NOPTS>
@@ -189,19 +202,19 @@ for iGLM = 1:size(all_GLMs)
             scans'
             
             matlabbatch = [];
-%             matlabbatch = set_ttest_batch(matlabbatch, ...
-%                 fullfile(grp_lvl_dir, grp_name), ...
-%                 scans, ...
-%                 {subdir_name}, ...
-%                 {'>'});
-%             
-%             spm_jobman('run', matlabbatch)
+            matlabbatch = set_ttest_batch(matlabbatch, ...
+                fullfile(grp_lvl_dir, grp_name), ...
+                scans, ...
+                {subdir_name}, ...
+                {'>'});
+            
+            spm_jobman('run', matlabbatch)
         end
         
     end
     
     %% two sample ttest
-
+    
     % Equal range vs. equal indifference:
     %
     % Greater positive response to losses in amygdala for equal range condition vs. equal indifference condition.
@@ -218,7 +231,7 @@ for iGLM = 1:size(all_GLMs)
     
     subj_to_include = find(group_id(1:nb_subj)==0);
     scans2 = scans_for_grp_lvl(contrast_ls, ctrsts, contrasts_file_ls, subj_to_include)
-
+    
     scans{1,1} =  scans1;
     scans{2,1} =  scans2;
     
