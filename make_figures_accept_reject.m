@@ -1,7 +1,6 @@
-% collects subject RT and plots how they are distributed
+% collects subject responses (1 = weak accept ; 2 = strong accept ; -1 =
+% weak reject ; -2 = strong reject) and plots how they are distributed
 % across gain and loss on average at the group level and for each subject
-% Also checks overall distributions of RT for each subjects and missed
-% reponses.
 
 clear
 clc
@@ -60,61 +59,47 @@ for i_group = 0:1 %loop through each group
             ['^' subject '.*.tsv$']);
         
         no_resp = [];
-        RT_mat = [];
+        accept_mat = [];
         
         for i_file = 1:size(files_2_load)
             
             % load each event file
             data = spm_load(files_2_load(i_file, :));
             
-            % count number of missing responses for that run
-            no_resp(i_file) = sum(strcmp(data.participant_response, 'NoResp')); %#ok<*SAGROW>
+            resp = nan(size(data.participant_response));
+            resp(strcmp(data.participant_response, 'weakly_accept')) = 1;
+            resp(strcmp(data.participant_response, 'strongly_accept')) = 2;
+            resp(strcmp(data.participant_response, 'strongly_reject')) = -2;
+            resp(strcmp(data.participant_response, 'weakly_reject')) = -1;
             
             % initialize matrix to store results
-            RT_mat(:, :, i_file) = nan(numel(loss_range), numel(gain_range));
+            accept_mat(:, :, i_file) = NaN(numel(loss_range), numel(gain_range)); %#ok<*SAGROW>
             
             for i_trial = 1:numel(data.onset)
                 loss = find( loss_range==data.loss(i_trial) ); % loss index
                 gain = find( gain_range==data.gain(i_trial) ); % loss index
-                if data.RT(i_trial)<.5 % only include RT with plausible RT
-                    RT_mat(loss, gain, i_file) =  0; % store RT of this trial in matrix
-                else
-                    RT_mat(loss, gain, i_file) = data.RT(i_trial);
+                if data.RT(i_trial)>=.5
+                    accept_mat(loss, gain, i_file) = resp(i_trial);
                 end
             end
         end
         
-        % store how many missed responses for that subject
-        participants.noresp(group_idx(i_subj),1) = sum(no_resp);
-        
-        % there should be only one type of trial for each gain/loss
-        % combination
-        check_norepeat = sum(isnan(RT_mat),3);
-        if any(check_norepeat(:)~=3)
-            error('Something is off: there should be no trial type repeat.')
-        end
-        
-        % average RT over runs
-        RT_mat = nanmean(RT_mat, 3);
-        RT_mat(RT_mat==0) = NaN; %if a trial was missed we replace its 0 value by NaN
-        
-        % append to the group results
-        RT_mat_grp{i_group+1}(:,:,i_subj) = nanmean(RT_mat, 3);
+        accept_mat_grp{i_group+1}(:,:,i_subj) = nanmean(accept_mat, 3);
         
     end
-
+    
 end
 
 
-%% plot RT
-figure('name', 'RT')
+%% plot accept-rejects
+figure('name', 'accept')
 
-CLIM = [1 2];
+CLIM = [-2 2];
 
 subplot(1, 2, 1)
-imagesc( nanmean(RT_mat_grp{1},3) , CLIM )
+imagesc( nanmean(accept_mat_grp{1},3) , CLIM )
 axis square
-title('RT equal indifference (seconds)')
+title('accept - equal indifference')
 ylabel('loss')
 xlabel('gain')
 set(gca, 'xtick', 1:2:numel(range(1).gain), ...
@@ -124,9 +109,9 @@ set(gca, 'xtick', 1:2:numel(range(1).gain), ...
 colorbar
 
 subplot(1, 2, 2)
-imagesc( nanmean(RT_mat_grp{2},3) , CLIM )
+imagesc( nanmean(accept_mat_grp{2},3) , CLIM )
 axis square
-title('RT equal range (seconds)')
+title('accept - equal range')
 ylabel('loss')
 xlabel('gain')
 set(gca, 'xtick', 1:2:numel(range(2).gain), ...
@@ -136,44 +121,35 @@ set(gca, 'xtick', 1:2:numel(range(2).gain), ...
 colorbar
 
 
-%% plot missed responses
-figure('name', 'Missed responses')
-bar(participants.noresp)
-title('Missed responses')
-ylabel('number of misses')
-xlabel('subject')
+%% plot all subjects
 
+CLIM = [-2 2];
 
-%% plot RT times for each subject
-figure('name', 'RT for each subject ')
-
-subplot(1, 2, 1)
-
-RT_to_plot = reshape(RT_mat_grp{1}, ...
-    [size(RT_mat_grp{1},1) * size(RT_mat_grp{1},2) , size(RT_mat_grp{1},3)]);
-
-boxplot(RT_to_plot)
-
-title('RT distribution per subject  - equal indifference group')
-ylabel('RT (secs)')
-xlabel('subject')
-set(gca, 'xtick', 1:2:size(RT_mat_grp{1},3), ...
-    'xticklabel', 1:2:size(RT_mat_grp{1},3), ...
-    'ytick', 0:.5:4, ...
-    'yticklabel', 0:.5:4)
-
-
-subplot(1, 2, 2)
-
-RT_to_plot = reshape(RT_mat_grp{2}, ...
-    [size(RT_mat_grp{2},1) * size(RT_mat_grp{2},2) , size(RT_mat_grp{2},3)]);
-
-boxplot(RT_to_plot)
-
-title('RT distribution per subject  - equal range group')
-ylabel('RT (secs)')
-xlabel('subject')
-set(gca, 'xtick', 1:2:size(RT_mat_grp{1},3), ...
-    'xticklabel', 1:2:size(RT_mat_grp{1},3), ...
-    'ytick', 0:.5:4, ...
-    'yticklabel', 0:.5:4)
+for i_group = 0:1 %loop through each group
+    
+    if i_group == 0
+        figure('name', 'accept - subject - equal indifference')
+    else
+        figure('name', 'accept - subject - equal range')
+    end
+    
+    group_idx = find(group_id==i_group);
+    
+    mn = length(group_idx);
+    n  = round(mn^0.4);
+    m  = ceil(mn/n);
+    
+    for i_subj = 1:numel(group_idx)
+        
+        subplot(m, n, i_subj)
+        
+        % get data for each subject
+        subject = participants.participant_id{ group_idx(i_subj) };
+        
+        imagesc( accept_mat_grp{i_group+1}(:,:,i_subj) , CLIM )
+        axis square
+        title(subject)
+        set(gca, 'xtick', [], ...
+            'ytick', [])
+    end
+end
