@@ -26,13 +26,6 @@ clc
 
 machine_id = 1;% 0: container ;  1: Remi ;  2: Marco
 
-% subj_to_exclude = {
-%     'sub-002';...
-%     'sub-009'};
-
-subj_to_exclude = {};
-
-
 %% setting up
 % setting up directories
 [data_dir, code_dir, output_dir, fMRIprep_DIR] = set_dir(machine_id);
@@ -51,16 +44,10 @@ participants_file = fullfile(code_dir, 'inputs', 'event_tsvs','participants.tsv'
 participants = spm_load(participants_file);
 group_id = strcmp(participants.group, 'equalRange');
 
-% Remove excluded subjects
-to_remove = ismember(participants.participant_id, subj_to_exclude);
-group_id(to_remove) = [];
-participants.participant_id(to_remove) = [];
-participants.group(to_remove) = [];
-participants.gender(to_remove) = [];
-participants.age(to_remove) = [];
+% remove excluded subjects
+[participants, group_id, folder_subj] = ...
+    rm_subjects(participants, group_id, folder_subj, 1)
 
-to_remove = ismember(folder_subj, subj_to_exclude);
-folder_subj(to_remove) = [];
 nb_subj = numel(folder_subj);
 
 
