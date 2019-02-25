@@ -13,27 +13,12 @@ machine_id = 1;
 participants_file = fullfile(code_dir, 'inputs', 'event_tsvs','participants.tsv');
 participants = spm_load(participants_file);
 
-% Remove outliers in terms of fMRI or behavior
-subj_to_remove = {
-    'sub-016', ...
-    'sub-030', ...
-    'sub-088', ...
-    'sub-100', ...
-    'sub-118', ...
-    'sub-022', ...
-    'sub-110', ...
-    'sub-116', ...
-    'sub-056'}'; %sub-056 seems to have buttons switched.
-% subj_to_remove = '';
-
-remove = ismember(participants.participant_id, subj_to_remove);
-
-participants.participant_id(remove) = [];
-participants.group(remove) = [];
-participants.gender(remove) = [];
-participants.age(remove) = [];
-
 group_id = strcmp(participants.group, 'equalRange');
+
+% remove excluded subjects
+[participants, group_id] = ...
+    rm_subjects(participants, group_id, [], 1);
+
 
 for i_group = 0:1 %loop through each group
     

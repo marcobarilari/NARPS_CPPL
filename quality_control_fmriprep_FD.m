@@ -1,6 +1,11 @@
-%  This script uses the report from MRIQC (bold and T1) identify outliers using
-%  robust statistics (interquartile range).
+%  This script uses the report from fmriprep to estimate the number of
+%  timepoints in framewise displacement timeseries with values superior to
+%  threshold.
 % https://fmriprep.readthedocs.io/en/stable/outputs.html
+
+% plots the proportion of timepoints per run (to identidy runs with that goes above a limit)
+% also plots the sum of the proportion of timepoints over the 4 runs to
+% identify who move a lot but for whom no run goes above the threshold
 
 clear
 clc
@@ -18,6 +23,9 @@ code_dir = pwd;
 participants_file = fullfile(code_dir, 'inputs', 'event_tsvs','participants.tsv');
 participants = spm_load(participants_file);
 group_id = strcmp(participants.group, 'equalRange');
+
+[participants, group_id] = ...
+    rm_subjects(participants, group_id, [], 0);
 
 FramewiseDisplacement = cell(2,1); % initialize
 
@@ -67,10 +75,7 @@ for i_group = 1:2
         / size(FramewiseDisplacement{i_group},1);
     
     summed_proportion = sum(reshape(proportion, [4, size(proportion,2)/4]));
-    
-    
-    
-    
+
     %%
     figure('name', ['Framewise Displacement - ' group_name])
 
