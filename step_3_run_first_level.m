@@ -10,8 +10,6 @@
 
 % TO DO:
 % opt.RT_correction
-% expected value
-% merge brain masks
 % - send email in case of crash or when finished
 % - add parfor loop over subjects (??): remember that parfor over GLM
 % estimation lead to problems. Makes me think this whole thing could be
