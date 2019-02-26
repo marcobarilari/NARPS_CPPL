@@ -30,6 +30,7 @@ machine_id = 0;% 0: container ;  1: Remi ;  2: Marco
 % setting up directories
 [data_dir, code_dir, output_dir, fMRIprep_DIR] = set_dir(machine_id);
 
+
 % listing subjects
 folder_subj = get_subj_list(output_dir);
 folder_subj = cellstr(char({folder_subj.name}')); % turn subject folders into a cellstr
@@ -102,7 +103,7 @@ for iGLM = 1:size(all_GLMs)
     contrasts_file_ls = struct('con_name', {}, 'con_file', {});
 
 
-    %% list the fiels
+    %% list the fields
     for isubj = 1:nb_subj
 
        subj_lvl_dir = fullfile ( ...
@@ -113,7 +114,6 @@ for iGLM = 1:size(all_GLMs)
 
         fprintf('\nloading SPM.mat %s',  folder_subj{isubj})
         load(fullfile(subj_lvl_dir, 'SPM.mat'))
-
 
         %% Stores names of the contrast images
         for iCtrst = 1:numel(contrast_ls)
@@ -136,7 +136,6 @@ for iGLM = 1:size(all_GLMs)
     %% ttest
     for i_ttest = 1:5
 
-
         switch i_ttest
             case 1
                 % Parametric effect of gain:
@@ -147,29 +146,47 @@ for iGLM = 1:size(all_GLMs)
 
             case 2
                 % Parametric effect of loss:
-                %
                 % Negative effect
                 cdts = {' gamble_trialxloss^1*bf(1) < 0'};
                 ctrsts = {'gamble_trialxloss<0'};
                 subdir_name = 'gamble_trialxloss_inf_baseline';
 
             case 3
+                % Parametric effect of loss:
                 % Positive effect
                 cdts = {' gamble_trialxloss^1*bf(1) > 0'};
                 ctrsts = {'gamble_trialxloss>0'};
                 subdir_name = 'gamble_trialxloss_sup_baseline';
 
             case 4
-                % Positive control on effect of gamble trials themselves
+                % gamble trials themselves ('positive control')
                 cdts = {' gamble_trial*bf(1) > 0'};
                 ctrsts = {'gamble_trial>0'};
                 subdir_name = 'gamble_trial_sup_baseline';
 
             case 5
-                % Positive control on effect of button presses
+                % gamble trials themselves ('positive control')
+                cdts = {' gamble_trial*bf(1) < 0'};
+                ctrsts = {'gamble_trial<0'};
+                subdir_name = 'gamble_trial_inf_baseline';
+
+            case 6
+                % button presses ('positive control')
                 cdts = {' gamble_trial_button_press*bf(1) > 0'};
                 ctrsts = {'gamble_trial_button_press>0'};
                 subdir_name = 'gamble_trial_button_press_sup_baseline';
+
+            case 7
+                % button presses ('positive control')
+                cdts = {' gamble_trial_button_press*bf(1) < 0'};
+                ctrsts = {'gamble_trial_button_press<0'};
+                subdir_name = 'gamble_trial_button_press_sup_baseline';
+
+        end
+
+        ctrsts %#ok<*NOPTS>
+
+        for iGroup = 1:2
 
             if iGroup==1
                 grp_name = 'equalRange';
@@ -195,7 +212,6 @@ for iGLM = 1:size(all_GLMs)
                 {subdir_name}, ...
                 {'>'});
 
-
             spm_jobman('run', matlabbatch)
         end
 
@@ -206,7 +222,6 @@ for iGLM = 1:size(all_GLMs)
     % Equal range vs. equal indifference:
     %
     % Greater positive response to losses in amygdala for equal range condition vs. equal indifference condition.
-
 
     % Positive effect
     cdts = {' gamble_trialxloss^1*bf(1) > 0'};
@@ -224,7 +239,6 @@ for iGLM = 1:size(all_GLMs)
     scans{1,1} =  scans1;
     scans{2,1} =  scans2;
 
-
     matlabbatch = [];
     matlabbatch = set_ttest_batch(matlabbatch, ...
         fullfile(grp_lvl_dir), ...
@@ -232,8 +246,6 @@ for iGLM = 1:size(all_GLMs)
         {subdir_name}, ...
         {'>'});
 
-
     spm_jobman('run', matlabbatch)
-
-
+    
 end
