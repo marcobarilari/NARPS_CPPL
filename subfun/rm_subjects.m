@@ -1,3 +1,4 @@
+
 function [ppp, grp_id, folder_subj] = rm_subjects(ppp, grp_id, folder_subj, rm_do)
 % Removes the particpants from the subject listing that have been
 % excluded because of their func/anat/beh data
@@ -13,6 +14,7 @@ if ~exist('folder_subj', 'var')
 end
 
 if rm_do
+
     % Remove outliers in terms of fMRI or behavior
     subj_to_exclude = {
         'sub-016', ...
@@ -41,4 +43,6 @@ if ~isempty(folder_subj)
     folder_subj(to_rm) = [];
 end
 
+
 end
+

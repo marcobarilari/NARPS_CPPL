@@ -34,8 +34,6 @@ machine_id = 0;% 0: container ;  1: Remi ;  2: Marco
 folder_subj = get_subj_list(output_dir);
 folder_subj = cellstr(char({folder_subj.name}')); % turn subject folders into a cellstr
 
-folder_subj
-
 opt = [];
 
 % Get which participant is in which group
@@ -94,10 +92,12 @@ for iGLM = 1:size(all_GLMs)
     %% get configuration for this GLM
     cfg = get_configuration(all_GLMs, opt, iGLM);
 
+
     % set output dir for this GLM configutation
     analysis_dir = name_analysis_dir(cfg);
     grp_lvl_dir = fullfile (output_dir, 'group', analysis_dir );
     mkdir(grp_lvl_dir)
+
 
     contrasts_file_ls = struct('con_name', {}, 'con_file', {});
 
@@ -136,6 +136,7 @@ for iGLM = 1:size(all_GLMs)
     %% ttest
     for i_ttest = 1:5
 
+
         switch i_ttest
             case 1
                 % Parametric effect of gain:
@@ -170,12 +171,6 @@ for iGLM = 1:size(all_GLMs)
                 ctrsts = {'gamble_trial_button_press>0'};
                 subdir_name = 'gamble_trial_button_press_sup_baseline';
 
-        end
-
-        ctrsts %#ok<*NOPTS>
-
-        for iGroup = 1:2
-
             if iGroup==1
                 grp_name = 'equalRange';
                 subj_to_include = find(group_id(1:nb_subj)==1);
@@ -200,6 +195,7 @@ for iGLM = 1:size(all_GLMs)
                 {subdir_name}, ...
                 {'>'});
 
+
             spm_jobman('run', matlabbatch)
         end
 
@@ -210,6 +206,7 @@ for iGLM = 1:size(all_GLMs)
     % Equal range vs. equal indifference:
     %
     % Greater positive response to losses in amygdala for equal range condition vs. equal indifference condition.
+
 
     % Positive effect
     cdts = {' gamble_trialxloss^1*bf(1) > 0'};
@@ -227,6 +224,7 @@ for iGLM = 1:size(all_GLMs)
     scans{1,1} =  scans1;
     scans{2,1} =  scans2;
 
+
     matlabbatch = [];
     matlabbatch = set_ttest_batch(matlabbatch, ...
         fullfile(grp_lvl_dir), ...
@@ -234,6 +232,8 @@ for iGLM = 1:size(all_GLMs)
         {subdir_name}, ...
         {'>'});
 
+
     spm_jobman('run', matlabbatch)
+
 
 end

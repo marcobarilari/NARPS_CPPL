@@ -1,3 +1,8 @@
+% collects subject RT and plots how they are distributed
+% across gain and loss on average at the group level and for each subject
+% Also checks overall distributions of RT for each subjects and missed
+% reponses.
+
 clear
 clc
 close all
@@ -8,12 +13,27 @@ machine_id = 1;
 % Get which participant is in which group
 participants_file = fullfile(code_dir, 'inputs', 'event_tsvs','participants.tsv');
 participants = spm_load(participants_file);
+
 group_id = strcmp(participants.group, 'equalRange');
+
+% remove excluded subjects
+[participants, group_id] = ...
+    rm_subjects(participants, group_id, [], 1);
 
 
 for i_group = 0:1 %loop through each group
     
     group_idx = find(group_id==i_group); % index of each subject
+    
+    if i_group == 0
+        gain_range = 10:2:40;
+    else
+        gain_range = 5:1:20;
+    end
+    loss_range = 5:1:20;
+    
+    range(i_group+1).gain = gain_range; % to keep track of those ranges for plotting
+    range(i_group+1).loss = loss_range;
     
     for i_subj = 1:numel(group_idx)
         
@@ -26,29 +46,26 @@ for i_group = 0:1 %loop through each group
         
         no_resp = [];
         RT_mat = [];
-        aceept_mat = [];
         
         for i_file = 1:size(files_2_load)
             
             % load each event file
             data = spm_load(files_2_load(i_file, :));
             
-            % define gain and loss range for that subject
-            if i_file==1
-                gain_range = unique(data.gain);
-                loss_range = unique(data.loss);
-            end
-            
             % count number of missing responses for that run
             no_resp(i_file) = sum(strcmp(data.participant_response, 'NoResp')); %#ok<*SAGROW>
-
+            
             % initialize matrix to store results
             RT_mat(:, :, i_file) = nan(numel(loss_range), numel(gain_range));
             
             for i_trial = 1:numel(data.onset)
                 loss = find( loss_range==data.loss(i_trial) ); % loss index
                 gain = find( gain_range==data.gain(i_trial) ); % loss index
-                RT_mat(loss, gain, i_file) =  data.RT(i_trial); % store RT of this trial in matrix
+                if data.RT(i_trial)<.5 % only include RT with plausible RT
+                    RT_mat(loss, gain, i_file) =  0; % store RT of this trial in matrix
+                else
+                    RT_mat(loss, gain, i_file) = data.RT(i_trial);
+                end
             end
         end
         
@@ -71,9 +88,6 @@ for i_group = 0:1 %loop through each group
         
     end
 
-    range(i_group+1).gain = gain_range;
-    range(i_group+1).loss = loss_range;
-    
 end
 
 
@@ -113,3 +127,38 @@ bar(participants.noresp)
 title('Missed responses')
 ylabel('number of misses')
 xlabel('subject')
+
+
+%% plot RT times for each subject
+figure('name', 'RT for each subject ')
+
+subplot(1, 2, 1)
+
+RT_to_plot = reshape(RT_mat_grp{1}, ...
+    [size(RT_mat_grp{1},1) * size(RT_mat_grp{1},2) , size(RT_mat_grp{1},3)]);
+
+boxplot(RT_to_plot)
+
+title('RT distribution per subject  - equal indifference group')
+ylabel('RT (secs)')
+xlabel('subject')
+set(gca, 'xtick', 1:2:size(RT_mat_grp{1},3), ...
+    'xticklabel', 1:2:size(RT_mat_grp{1},3), ...
+    'ytick', 0:.5:4, ...
+    'yticklabel', 0:.5:4)
+
+
+subplot(1, 2, 2)
+
+RT_to_plot = reshape(RT_mat_grp{2}, ...
+    [size(RT_mat_grp{2},1) * size(RT_mat_grp{2},2) , size(RT_mat_grp{2},3)]);
+
+boxplot(RT_to_plot)
+
+title('RT distribution per subject  - equal range group')
+ylabel('RT (secs)')
+xlabel('subject')
+set(gca, 'xtick', 1:2:size(RT_mat_grp{1},3), ...
+    'xticklabel', 1:2:size(RT_mat_grp{1},3), ...
+    'ytick', 0:.5:4, ...
+    'yticklabel', 0:.5:4)
