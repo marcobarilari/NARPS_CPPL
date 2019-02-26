@@ -30,7 +30,6 @@ machine_id = 0;% 0: container ;  1: Remi ;  2: Marco
 % setting up directories
 [data_dir, code_dir, output_dir, fMRIprep_DIR] = set_dir(machine_id);
 
-output_dir
 
 % listing subjects
 folder_subj = get_subj_list(output_dir);
@@ -44,8 +43,9 @@ participants = spm_load(participants_file);
 group_id = strcmp(participants.group, 'equalRange');
 
 % remove excluded subjects
-[participants, group_id, folder_subj] = ...
-    rm_subjects(participants, group_id, folder_subj, 1)
+[participants, group_id, folder_subj] = rm_subjects(participants, group_id, folder_subj, true);
+
+folder_subj
 
 nb_subj = numel(folder_subj);
 
@@ -93,23 +93,27 @@ for iGLM = 1:size(all_GLMs)
     %% get configuration for this GLM
     cfg = get_configuration(all_GLMs, opt, iGLM);
 
+
     % set output dir for this GLM configutation
     analysis_dir = name_analysis_dir(cfg);
     grp_lvl_dir = fullfile (output_dir, 'group', analysis_dir );
     mkdir(grp_lvl_dir)
 
+
     contrasts_file_ls = struct('con_name', {}, 'con_file', {});
 
 
-    %% list the fiels
+    %% list the fields
     for isubj = 1:nb_subj
 
-                subj_lvl_dir = fullfile ( ...
-                    output_dir, folder_subj{isubj}, analysis_dir);
+       subj_lvl_dir = fullfile ( ...
+          output_dir, folder_subj{isubj}, analysis_dir);
 
+        %subj_lvl_dir = fullfile ( ...
+        %    output_dir, folder_subj{isubj});
+
+        fprintf('\nloading SPM.mat %s',  folder_subj{isubj})
         load(fullfile(subj_lvl_dir, 'SPM.mat'))
-
-        fprintf('\nloading SPM.mat %s', folder_subj{isubj})
 
         %% Stores names of the contrast images
         for iCtrst = 1:numel(contrast_ls)
@@ -119,6 +123,10 @@ for iGLM = 1:size(all_GLMs)
 
             contrasts_file_ls(isubj).con_file{iCtrst,1} = ...
                 fullfile(subj_lvl_dir, SPM.xCon(iCtrst).Vcon.fname);
+
+            if ~exist(contrasts_file_ls(isubj).con_file{iCtrst,1}, 'file')
+              error('file not found')
+            end
 
         end
 
@@ -239,5 +247,5 @@ for iGLM = 1:size(all_GLMs)
         {'>'});
 
     spm_jobman('run', matlabbatch)
-
+    
 end
