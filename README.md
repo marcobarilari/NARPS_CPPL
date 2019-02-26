@@ -46,6 +46,10 @@ Type in the following command to copy the relevant files and unzip them:
 Type in the following command to copy the relevant files and unzip them:
 `step_3_run_first_level.m`
 
+### Running the group level GLM
+Type in the following command to copy the relevant files and unzip them:
+`step_4_run_second_level.m`
+
 
 ## docker
 
