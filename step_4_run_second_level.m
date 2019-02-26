@@ -141,29 +141,41 @@ for iGLM = 1:size(all_GLMs)
                 
             case 2
                 % Parametric effect of loss:
-                %
                 % Negative effect
                 cdts = {' gamble_trialxloss^1*bf(1) < 0'};
                 ctrsts = {'gamble_trialxloss<0'};
                 subdir_name = 'gamble_trialxloss_inf_baseline';
                 
             case 3
+                % Parametric effect of loss:
                 % Positive effect
                 cdts = {' gamble_trialxloss^1*bf(1) > 0'};
                 ctrsts = {'gamble_trialxloss>0'};
                 subdir_name = 'gamble_trialxloss_sup_baseline';
                 
             case 4
-                % Positive control on effect of gamble trials themselves
+                % gamble trials themselves ('positive control')
                 cdts = {' gamble_trial*bf(1) > 0'};
                 ctrsts = {'gamble_trial>0'};
                 subdir_name = 'gamble_trial_sup_baseline';
                 
             case 5
-                % Positive control on effect of button presses
+                % gamble trials themselves ('positive control')
+                cdts = {' gamble_trial*bf(1) < 0'};
+                ctrsts = {'gamble_trial<0'};
+                subdir_name = 'gamble_trial_inf_baseline';                
+                
+            case 6
+                % button presses ('positive control')
                 cdts = {' gamble_trial_button_press*bf(1) > 0'};
                 ctrsts = {'gamble_trial_button_press>0'};
                 subdir_name = 'gamble_trial_button_press_sup_baseline';
+                
+            case 7
+                % button presses ('positive control')
+                cdts = {' gamble_trial_button_press*bf(1) < 0'};
+                ctrsts = {'gamble_trial_button_press<0'};
+                subdir_name = 'gamble_trial_button_press_sup_baseline';                
                 
         end
         
