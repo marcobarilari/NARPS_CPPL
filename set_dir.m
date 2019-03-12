@@ -19,8 +19,8 @@ switch machine_id
         output_dir = fullfile(data_dir, 'derivatives', 'spm12');
     case 2 % mac matlab/octave : Marco
         error('directory paths not set up');
-        code_dir = '';% ???????
-        data_dir = '';% ???????
+        code_dir = '/Users/barilari/GitHub/NARPS_CPPL';
+        data_dir = '/Users/barilari/data/narps';
         output_dir = fullfile(data_dir, 'derivatives', 'spm12');
 end
 
